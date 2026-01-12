@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binance Scalping Bot - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Binance Scalping Bot</h1>
+            <nav>
+                <a href="/" class="nav-link active">Dashboard</a>
+                <a href="/history" class="nav-link">History</a>
+            </nav>
+        </header>
+
+        <div class="stats-grid">
+            <div class="card">
+                <div class="stat-label">Status</div>
+                <div class="stat-value" id="bot-status">
+                    {% if state and state.is_running %}
+                        <span class="status-running">RUNNING</span>
+                    {% else %}
+                        <span class="status-stopped">STOPPED</span>
+                    {% endif %}
+                </div>
+                <div style="margin-top: 10px;">
+                    <button class="btn" onclick="toggleBot()">
+                        {% if state and state.is_running %}Stop Bot{% else %}Start Bot{% endif %}
+                    </button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="stat-label">Mode</div>
+                <div class="stat-value">
+                    {% if state and state.is_dry_run %}DRY RUN{% else %}LIVE{% endif %}
+                </div>
+            </div>
+            <div class="card">
+                <div class="stat-label">Total PnL</div>
+                <div class="stat-value {% if total_pnl|float > 0 %}pnl-positive{% elif total_pnl|float < 0 %}pnl-negative{% endif %}">
+                    ${{ total_pnl }}
+                </div>
+            </div>
+            <div class="card">
+                <div class="stat-label">Win Rate</div>
+                <div class="stat-value">{{ win_rate }}%</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Active Positions</h2>
+            {% if active_trades %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Side</th>
+                        <th>Entry Price</th>
+                        <th>Quantity</th>
+                        <th>Current PnL (Unrealized)</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trade in active_trades %}
+                    <tr>
+                        <td>{{ trade.symbol }}</td>
+                        <td style="color: {% if trade.side == 'LONG' %}#4ade80{% else %}#f87171{% endif %}">{{ trade.side }}</td>
+                        <td>{{ trade.entry_price }}</td>
+                        <td>{{ trade.quantity }}</td>
+                        <td>-</td> <!-- Needs real-time update logic or fetched from DB if updated constantly -->
+                        <td>{{ trade.entry_time }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color: #94a3b8;">No active positions.</p>
+            {% endif %}
+            
+            <!-- Real-time position from Exchange (if available in State) -->
+            <!-- Ideally, the bot updates the DB with open positions periodically -->
+        </div>
+
+        <div class="card">
+            <h2>Recent Activities</h2>
+            {% if recent_trades %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Side</th>
+                        <th>Result</th>
+                        <th>PnL</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trade in recent_trades %}
+                    <tr>
+                        <td>{{ trade.symbol }}</td>
+                        <td style="color: {% if trade.side == 'LONG' %}#4ade80{% else %}#f87171{% endif %}">{{ trade.side }}</td>
+                        <td>{{ trade.status }}</td>
+                        <td class="{% if trade.pnl and trade.pnl > 0 %}pnl-positive{% elif trade.pnl and trade.pnl < 0 %}pnl-negative{% endif %}">
+                            {{ trade.pnl or '-' }}
+                        </td>
+                        <td>{{ trade.exit_time or trade.entry_time }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color: #94a3b8;">No recent trades.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function toggleBot() {
+            fetch('/api/toggle_bot', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        location.reload();
+                    } else {
+                        alert('Error toggling bot');
+                    }
+                });
+        }
+    </script>
+</body>
+</html>

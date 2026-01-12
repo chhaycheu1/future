@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binance Scalping Bot - History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Binance Scalping Bot</h1>
+            <nav>
+                <a href="/" class="nav-link">Dashboard</a>
+                <a href="/history" class="nav-link active">History</a>
+            </nav>
+        </header>
+
+        <div class="card">
+            <h2>Trade History</h2>
+            {% if trades %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Symbol</th>
+                        <th>Side</th>
+                        <th>Entry Price</th>
+                        <th>Exit Price</th>
+                        <th>Quantity</th>
+                        <th>PnL</th>
+                        <th>Entry Time</th>
+                        <th>Exit Time</th>
+                        <th>Strategy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trade in trades %}
+                    <tr>
+                        <td>{{ trade.id }}</td>
+                        <td>{{ trade.symbol }}</td>
+                        <td style="color: {% if trade.side == 'LONG' %}#4ade80{% else %}#f87171{% endif %}">{{ trade.side }}</td>
+                        <td>{{ trade.entry_price }}</td>
+                        <td>{{ trade.exit_price }}</td>
+                        <td>{{ trade.quantity }}</td>
+                        <td class="{% if trade.pnl and trade.pnl > 0 %}pnl-positive{% elif trade.pnl and trade.pnl < 0 %}pnl-negative{% endif %}">
+                            {{ trade.pnl or '-' }}
+                        </td>
+                        <td>{{ trade.entry_time }}</td>
+                        <td>{{ trade.exit_time }}</td>
+                        <td>{{ trade.strategy }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color: #94a3b8;">No trade history.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
