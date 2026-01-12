@@ -1,0 +1,111 @@
+2026-01-12 20:32:23,890 - Main - INFO - Starting Application...
+2026-01-12 20:32:23,891 - Main - INFO - Initializing Trading Bot...
+2026-01-12 20:32:23,891 - Main - INFO - Starting Web Server on port 5000...
+2026-01-12 20:32:23,914 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.31.43:5000
+2026-01-12 20:32:23,914 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-01-12 20:32:23,923 - Main - ERROR - Bot thread crashed: HTTPSConnectionPool(host='api.binance.com', port=443): Max retries exceeded with url: /api/v3/ping (Caused by NameResolutionError("HTTPSConnection(host='api.binance.com', port=443): Failed to resolve 'api.binance.com' ([Errno 11001] getaddrinfo failed)"))
+2026-01-12 20:32:42,911 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:32:42] "GET / HTTP/1.1" 200 -
+2026-01-12 20:32:43,062 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:32:43] "GET /static/style.css HTTP/1.1" 200 -
+2026-01-12 20:32:43,111 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:32:43] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-01-12 20:42:25,572 - Main - INFO - Starting Application...
+2026-01-12 20:42:25,573 - Main - INFO - Initializing Trading Bot...
+2026-01-12 20:42:25,573 - Main - INFO - Starting Web Server on port 5000...
+2026-01-12 20:42:25,587 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.31.43:5000
+2026-01-12 20:42:25,588 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-01-12 20:42:26,427 - Main - ERROR - Bot thread crashed: Working outside of application context.
+
+This typically means that you attempted to use functionality that needed
+the current application. To solve this, set up an application context
+with app.app_context(). See the documentation for more information.
+2026-01-12 20:43:25,917 - Main - INFO - Starting Application...
+2026-01-12 20:43:25,918 - Main - INFO - Initializing Trading Bot...
+2026-01-12 20:43:25,918 - Main - INFO - Starting Web Server on port 5000...
+2026-01-12 20:43:25,938 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.31.43:5000
+2026-01-12 20:43:25,939 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-01-12 20:43:53,392 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:43:53] "GET / HTTP/1.1" 200 -
+2026-01-12 20:43:53,506 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:43:53] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 20:55:52,122 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:55:52] "GET / HTTP/1.1" 200 -
+2026-01-12 20:55:52,179 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:55:52] "GET /static/style.css HTTP/1.1" 200 -
+2026-01-12 20:55:52,769 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:55:52] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-01-12 20:55:55,867 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:55:55] "POST /api/toggle_bot HTTP/1.1" 200 -
+2026-01-12 20:55:55,881 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:55:55] "GET / HTTP/1.1" 200 -
+2026-01-12 20:55:55,901 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:55:55] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 20:55:58,196 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:55:58] "POST /api/toggle_bot HTTP/1.1" 200 -
+2026-01-12 20:55:58,217 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:55:58] "GET / HTTP/1.1" 200 -
+2026-01-12 20:55:58,234 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:55:58] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 20:56:04,697 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:56:04] "GET /history HTTP/1.1" 200 -
+2026-01-12 20:56:04,718 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:56:04] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 20:56:07,088 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:56:07] "GET / HTTP/1.1" 200 -
+2026-01-12 20:56:07,113 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 20:56:07] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 21:00:29,326 - Main - INFO - Starting Application...
+2026-01-12 21:00:29,327 - Main - INFO - Initializing Trading Bot...
+2026-01-12 21:00:29,327 - Main - INFO - Starting Web Server on port 5000...
+2026-01-12 21:00:29,359 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.31.43:5000
+2026-01-12 21:00:29,359 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-01-12 21:00:45,525 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:00:45] "GET /history HTTP/1.1" 200 -
+2026-01-12 21:00:45,633 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:00:45] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 21:01:44,232 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:01:44] "POST /api/backtest HTTP/1.1" 200 -
+2026-01-12 21:01:45,806 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:01:45] "GET /history HTTP/1.1" 200 -
+2026-01-12 21:01:45,879 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:01:45] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 21:03:44,894 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:03:44] "GET / HTTP/1.1" 200 -
+2026-01-12 21:03:44,925 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:03:44] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 21:04:06,499 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:04:06] "GET /history HTTP/1.1" 200 -
+2026-01-12 21:04:06,527 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:04:06] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 21:09:24,577 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:09:24] "GET / HTTP/1.1" 200 -
+2026-01-12 21:09:24,603 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:09:24] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 21:10:50,862 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:10:50] "GET /history HTTP/1.1" 200 -
+2026-01-12 21:10:50,920 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:10:50] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 21:11:21,833 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:11:21] "POST /api/backtest HTTP/1.1" 200 -
+2026-01-12 21:11:23,442 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:11:23] "GET /history HTTP/1.1" 200 -
+2026-01-12 21:11:23,529 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:11:23] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 21:15:36,040 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:15:36] "GET /history HTTP/1.1" 200 -
+2026-01-12 21:15:36,165 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:15:36] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 21:17:08,904 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:17:08] "POST /api/backtest HTTP/1.1" 200 -
+2026-01-12 21:17:10,494 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:17:10] "GET /history HTTP/1.1" 200 -
+2026-01-12 21:17:10,565 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 21:17:10] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 22:49:26,614 - Main - INFO - Starting Application...
+2026-01-12 22:49:26,615 - Main - INFO - Initializing Trading Bot...
+2026-01-12 22:49:26,616 - Main - INFO - Starting Web Server on port 5000...
+2026-01-12 22:49:26,660 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.31.43:5000
+2026-01-12 22:49:26,661 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-01-12 22:49:49,304 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:49:49] "GET /history HTTP/1.1" 200 -
+2026-01-12 22:49:49,576 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:49:49] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 22:49:49,738 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:49:49] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-01-12 22:50:20,229 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:50:20] "POST /api/backtest HTTP/1.1" 200 -
+2026-01-12 22:50:21,863 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:50:21] "GET /history HTTP/1.1" 200 -
+2026-01-12 22:50:21,987 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:50:21] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 22:54:06,931 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:54:06] "[35m[1mPOST /api/backtest HTTP/1.1[0m" 500 -
+2026-01-12 22:55:18,400 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:55:18] "GET /history HTTP/1.1" 200 -
+2026-01-12 22:55:18,464 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:55:18] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 22:55:34,443 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:55:34] "[35m[1mPOST /api/backtest HTTP/1.1[0m" 500 -
+2026-01-12 22:56:08,862 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:56:08] "[35m[1mPOST /api/backtest HTTP/1.1[0m" 500 -
+2026-01-12 22:56:15,171 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:56:15] "GET / HTTP/1.1" 200 -
+2026-01-12 22:56:15,261 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:56:15] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 22:56:34,842 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:56:34] "GET /history HTTP/1.1" 200 -
+2026-01-12 22:56:34,988 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:56:34] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 22:57:19,948 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:57:19] "[35m[1mPOST /api/backtest HTTP/1.1[0m" 500 -
+2026-01-12 22:59:07,116 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:59:07] "POST /api/backtest HTTP/1.1" 200 -
+2026-01-12 22:59:08,699 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:59:08] "GET /history HTTP/1.1" 200 -
+2026-01-12 22:59:08,768 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:59:08] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 22:59:15,997 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:59:15] "GET / HTTP/1.1" 200 -
+2026-01-12 22:59:16,030 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:59:16] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 22:59:29,656 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:59:29] "GET /history HTTP/1.1" 200 -
+2026-01-12 22:59:29,693 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 22:59:29] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-12 23:00:41,619 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 23:00:41] "POST /api/backtest HTTP/1.1" 200 -
+2026-01-12 23:00:43,248 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 23:00:43] "GET /history HTTP/1.1" 200 -
+2026-01-12 23:00:43,330 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 23:00:43] "[36mGET /static/style.css HTTP/1.1[0m" 304 -

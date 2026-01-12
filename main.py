@@ -18,12 +18,10 @@ logger = logging.getLogger("Main")
 
 def start_bot():
     try:
-        logger.info("Initializing Trading Bot...")
-        bot = TradingBot(Config, db_manager)
-        bot.start() # This calls run_loop which has a while loop, but run_loop is called inside start? 
-        # Wait, in my bot.py, start() calls db update then run_loop() which blocks if not threaded inside bot.
-        # My bot.py start() calls run_loop() directly at the end. 
-        # So bot.start() IS blocking. That's fine for this thread.
+        with app.app_context():
+            logger.info("Initializing Trading Bot...")
+            bot = TradingBot(Config, db_manager)
+            bot.start()
     except Exception as e:
         logger.error(f"Bot thread crashed: {e}")
 

@@ -7,6 +7,7 @@ class Config:
     # Binance API
     BINANCE_API_KEY = os.getenv("BINANCE_API_KEY", "")
     BINANCE_API_SECRET = os.getenv("BINANCE_API_SECRET", "")
+    TESTNET = os.getenv("TESTNET", "True").lower() in ("true", "1", "t")
     
     # Trading Settings
     SYMBOL = os.getenv("SYMBOL", "BTCUSDT")  # Default Pair

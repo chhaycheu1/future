@@ -10,7 +10,7 @@ class TradingBot:
     def __init__(self, config, db_manager):
         self.config = config
         self.db_manager = db_manager
-        self.exchange = BinanceClient(config.BINANCE_API_KEY, config.BINANCE_API_SECRET)
+        self.exchange = BinanceClient(config.BINANCE_API_KEY, config.BINANCE_API_SECRET, testnet=config.TESTNET)
         self.risk_manager = RiskManager(config, db_manager)
         self.strategy = ScalpingStrategy(self.risk_manager)
         self.symbol = config.SYMBOL
