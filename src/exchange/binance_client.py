@@ -4,9 +4,32 @@ from binance.exceptions import BinanceAPIException
 import pandas as pd
 from datetime import datetime
 
+# Testnet and Mainnet endpoints
+TESTNET_BASE_URL = "https://testnet.binancefuture.com"
+MAINNET_BASE_URL = "https://fapi.binance.com"
+
 class BinanceClient:
     def __init__(self, api_key, api_secret, testnet=False):
-        self.client = Client(api_key, api_secret, testnet=testnet)
+        """
+        Initialize Binance Futures client.
+        
+        Args:
+            api_key: Your Binance API key
+            api_secret: Your Binance API secret
+            testnet: If True, connects to testnet.binancefuture.com
+                     If False, connects to fapi.binance.com (REAL MONEY)
+        """
+        self.testnet = testnet
+        
+        if testnet:
+            # Testnet configuration
+            self.client = Client(api_key, api_secret, testnet=True)
+            self.client.FUTURES_URL = TESTNET_BASE_URL + "/fapi/v1"
+            print("🧪 Connected to BINANCE FUTURES TESTNET")
+        else:
+            # Production/Mainnet configuration
+            self.client = Client(api_key, api_secret)
+            print("💰 Connected to BINANCE FUTURES MAINNET (REAL MONEY!)")
     
     def get_market_price(self, symbol):
         try:
