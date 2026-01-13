@@ -7,7 +7,7 @@ body {
 }
 
 .container {
-    max_width: 1200px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
@@ -113,4 +113,43 @@ td {
 .nav-link.active {
     color: #38bdf8;
     font-weight: bold;
+}
+
+/* Input styles */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.input-group label {
+    font-size: 11px;
+    color: #94a3b8;
+    text-transform: uppercase;
+}
+
+.input-group input {
+    background-color: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    color: #e2e8f0;
+    padding: 8px 10px;
+    font-size: 14px;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #38bdf8;
+}
+
+.input-with-hint {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.hint {
+    font-size: 10px;
+    color: #fbbf24;
+    font-style: italic;
 }

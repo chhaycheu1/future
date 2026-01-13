@@ -1,6 +1,6 @@
 python-binance
 pandas
-pandas-ta
+ta
 python-dotenv
 flask
 flask-sqlalchemy

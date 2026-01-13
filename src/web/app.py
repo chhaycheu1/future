@@ -23,6 +23,22 @@ def dashboard():
     winning_trades = Trade.query.filter(Trade.pnl > 0).count()
     win_rate = (winning_trades / total_trades * 100) if total_trades > 0 else 0
     total_pnl = sum([t.pnl for t in Trade.query.filter(Trade.status == 'CLOSED').all() if t.pnl])
+    
+    # Fetch wallet balance
+    wallet_balance = 0.0
+    try:
+        exchange = BinanceClient(
+            Config.BINANCE_API_KEY, 
+            Config.BINANCE_API_SECRET, 
+            testnet=getattr(Config, 'TESTNET', False)
+        )
+        wallet_balance, _ = exchange.get_account_balance('USDT')
+    except Exception as e:
+        print(f"Error fetching wallet balance: {e}")
+    
+    # Current settings
+    current_leverage = getattr(Config, 'LEVERAGE', 5)
+    position_size_pct = getattr(Config, 'RISK_PER_TRADE', 0.01) * 100
 
     return render_template('dashboard.html', 
                            state=state, 
@@ -30,7 +46,10 @@ def dashboard():
                            recent_trades=recent_trades,
                            win_rate=f"{win_rate:.2f}",
                            total_pnl=f"{total_pnl:.2f}",
-                           total_trades=total_trades)
+                           total_trades=total_trades,
+                           wallet_balance=f"{wallet_balance:.2f}",
+                           current_leverage=current_leverage,
+                           position_size_pct=f"{position_size_pct:.1f}")
 
 @app.route('/history')
 def history():

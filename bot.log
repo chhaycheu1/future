@@ -109,3 +109,43 @@ with app.app_context(). See the documentation for more information.
 2026-01-12 23:00:41,619 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 23:00:41] "POST /api/backtest HTTP/1.1" 200 -
 2026-01-12 23:00:43,248 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 23:00:43] "GET /history HTTP/1.1" 200 -
 2026-01-12 23:00:43,330 - werkzeug - INFO - 127.0.0.1 - - [12/Jan/2026 23:00:43] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-13 14:29:23,511 - Main - INFO - Starting Application...
+2026-01-13 14:29:23,514 - Main - INFO - Initializing Trading Bot...
+2026-01-13 14:29:23,514 - Main - INFO - Starting Web Server on port 5000...
+2026-01-13 14:29:23,525 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.48:5000
+2026-01-13 14:29:23,525 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-01-13 14:29:40,724 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 14:29:40] "GET / HTTP/1.1" 200 -
+2026-01-13 14:29:40,792 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 14:29:40] "GET /static/style.css HTTP/1.1" 200 -
+2026-01-13 14:29:40,951 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 14:29:40] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-01-13 15:52:53,308 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 15:52:53] "GET / HTTP/1.1" 200 -
+2026-01-13 15:52:53,347 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 15:52:53] "GET /static/style.css HTTP/1.1" 200 -
+2026-01-13 15:52:53,655 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 15:52:53] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-01-13 15:52:56,133 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 15:52:56] "GET /history HTTP/1.1" 200 -
+2026-01-13 15:52:56,200 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 15:52:56] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-13 15:53:01,227 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 15:53:01] "GET / HTTP/1.1" 200 -
+2026-01-13 15:53:01,531 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 15:53:01] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-13 15:53:05,916 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 15:53:05] "POST /api/toggle_bot HTTP/1.1" 200 -
+2026-01-13 15:53:06,114 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 15:53:06] "GET / HTTP/1.1" 200 -
+2026-01-13 15:53:06,236 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 15:53:06] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-13 16:06:29,314 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:06:29] "GET /history HTTP/1.1" 200 -
+2026-01-13 16:06:29,409 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:06:29] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-13 16:06:34,270 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:06:34] "POST /api/backtest HTTP/1.1" 200 -
+2026-01-13 16:06:36,114 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:06:36] "GET /history HTTP/1.1" 200 -
+2026-01-13 16:06:36,131 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:06:36] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-13 16:06:46,067 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:06:46] "GET / HTTP/1.1" 200 -
+2026-01-13 16:06:46,367 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:06:46] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-13 16:06:48,826 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:06:48] "GET /history HTTP/1.1" 200 -
+2026-01-13 16:06:48,884 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:06:48] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-13 16:06:52,443 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:06:52] "POST /api/backtest HTTP/1.1" 200 -
+2026-01-13 16:06:54,267 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:06:54] "GET /history HTTP/1.1" 200 -
+2026-01-13 16:06:54,278 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:06:54] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-13 16:07:12,618 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:07:12] "POST /api/backtest HTTP/1.1" 200 -
+2026-01-13 16:07:14,459 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:07:14] "GET /history HTTP/1.1" 200 -
+2026-01-13 16:07:14,474 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:07:14] "GET /static/style.css HTTP/1.1" 200 -
+2026-01-13 16:07:18,817 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:07:18] "GET / HTTP/1.1" 200 -
+2026-01-13 16:07:19,126 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:07:19] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-01-13 16:07:22,225 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:07:22] "GET / HTTP/1.1" 200 -
+2026-01-13 16:07:22,245 - werkzeug - INFO - 127.0.0.1 - - [13/Jan/2026 16:07:22] "[36mGET /static/style.css HTTP/1.1[0m" 304 -

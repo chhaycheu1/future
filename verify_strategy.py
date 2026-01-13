@@ -2,8 +2,6 @@ import pandas as pd
 import numpy as np
 from src.strategy.scalping_strategy import ScalpingStrategy
 from src.core.risk_manager import RiskManager
-from config.settings import Config
-from src.database.db_manager import DBManager
 # Mock DB Manager
 class MockDBManager:
     def get_recent_trades(self, limit): return []
