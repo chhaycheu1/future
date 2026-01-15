@@ -3,19 +3,28 @@ from datetime import datetime
 class RiskManager:
     def __init__(self, config, db_manager):
         self.risk_per_trade = config.RISK_PER_TRADE
+        self.position_size_usdt = getattr(config, 'POSITION_SIZE_USDT', 0)
+        self.leverage = getattr(config, 'LEVERAGE', 5)
         self.sl_multiplier = config.STOP_LOSS_ATR_MULTIPLIER
         self.tp_rr = config.TAKE_PROFIT_RR
         self.db_manager = db_manager
 
     def calculate_position_size(self, account_balance, entry_price, stop_loss):
         """
-        Calculates position size based on risk percentage and stop loss distance.
-        Risk Amount = Account Balance * Risk %
-        Position Size = Risk Amount / |Entry - SL|
+        Calculates position size.
+        If POSITION_SIZE_USDT > 0: Uses fixed USDT amount * leverage / entry_price
+        Else: Uses risk percentage and stop loss distance
         """
-        if account_balance <= 0:
+        if account_balance <= 0 or entry_price <= 0:
             return 0
         
+        # Fixed USDT amount mode
+        if self.position_size_usdt > 0:
+            # Position size in coins = (USDT amount * leverage) / entry price
+            position_size = (self.position_size_usdt * self.leverage) / entry_price
+            return position_size
+        
+        # Percentage-based risk mode
         risk_amount = account_balance * self.risk_per_trade
         price_diff = abs(entry_price - stop_loss)
         

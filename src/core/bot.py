@@ -13,7 +13,7 @@ class TradingBot:
         self.exchange = BinanceClient(config.BINANCE_API_KEY, config.BINANCE_API_SECRET, testnet=config.TESTNET)
         self.risk_manager = RiskManager(config, db_manager)
         self.strategy = ScalpingStrategy(self.risk_manager)
-        self.symbol = config.SYMBOL
+        self.symbols = getattr(config, 'SYMBOLS', [config.SYMBOL])  # Use SYMBOLS list or fallback to single SYMBOL
         self.timeframe = config.TIMEFRAME
         self.is_running = False
         self._stop_event = threading.Event()
@@ -21,7 +21,8 @@ class TradingBot:
     def start(self):
         self.is_running = True
         self._stop_event.clear()
-        print(f"Bot started for {self.symbol} on {self.timeframe} timeframe.")
+        print(f"Bot started for {len(self.symbols)} pairs on {self.timeframe} timeframe.")
+        print(f"Pairs: {', '.join(self.symbols)}")
         self.db_manager.update_bot_state(is_running=True)
         self.run_loop()
 
@@ -38,37 +39,42 @@ class TradingBot:
                 self.is_running = False
                 break
             
-            # Simple check to stop if logic says so, 
-            # but usually the bot class controls the state.
-            
             try:
-                self.process_candle()
+                # Scan all symbols
+                for symbol in self.symbols:
+                    if self._stop_event.is_set():
+                        break
+                    self.process_symbol(symbol)
             except Exception as e:
                 print(f"Error in main loop: {e}")
             
             time.sleep(10) # Poll every 10 seconds
 
-    def process_candle(self):
-        # 1. Fetch Data
-        df = self.exchange.get_historical_klines(self.symbol, self.timeframe, limit=205)
-        if df.empty:
-            return
+    def process_symbol(self, symbol):
+        """Process a single symbol for signals."""
+        try:
+            # 1. Fetch Data
+            df = self.exchange.get_historical_klines(symbol, self.timeframe, limit=205)
+            if df.empty:
+                return
 
-        # 2. Analyze Strategy
-        current_price = df['close'].iloc[-1]
-        signal, entry_price, stop_loss, take_profit = self.strategy.analyze(df)
-        
-        # 3. Check for Exits (Manage Open Trades)
-        self.manage_open_trades(current_price)
+            # 2. Analyze Strategy
+            current_price = df['close'].iloc[-1]
+            signal, entry_price, stop_loss, take_profit = self.strategy.analyze(df)
+            
+            # 3. Check for Exits (Manage Open Trades for this symbol)
+            self.manage_open_trades_for_symbol(symbol, current_price)
 
-        # 4. Execute New Trade
-        if signal != 'NONE':
-            self.execute_trade(signal, entry_price, stop_loss, take_profit)
+            # 4. Execute New Trade
+            if signal != 'NONE':
+                self.execute_trade(symbol, signal, entry_price, stop_loss, take_profit)
+        except Exception as e:
+            print(f"Error processing {symbol}: {e}")
 
-    def execute_trade(self, signal, entry_price, stop_loss, take_profit):
+    def execute_trade(self, symbol, signal, entry_price, stop_loss, take_profit):
         open_trades = self.db_manager.get_open_trades()
         # Ensure only one trade per symbol
-        if any(t.symbol == self.symbol for t in open_trades):
+        if any(t.symbol == symbol for t in open_trades):
             return
 
         # Risk Checks
@@ -78,12 +84,25 @@ class TradingBot:
 
         position_size = self.risk_manager.calculate_position_size(account_balance, entry_price, stop_loss)
         
-        print(f"Signal: {signal} | Price: {entry_price} | SL: {stop_loss} | TP: {take_profit} | Size: {position_size:.4f}")
+        # Round position size based on asset price (precision adjustment)
+        if entry_price > 1000:  # BTC, etc.
+            position_size = round(position_size, 3)
+        elif entry_price > 10:  # ETH, BNB, etc.
+            position_size = round(position_size, 2)
+        elif entry_price > 1:   # SOL, LINK, etc.
+            position_size = round(position_size, 1)
+        else:                   # DOGE, XRP, etc.
+            position_size = round(position_size, 0)
+        
+        if position_size <= 0:
+            return
+        
+        print(f"📈 {symbol} {signal} | Entry: {entry_price:.2f} | SL: {stop_loss:.2f} | TP: {take_profit:.2f} | Size: {position_size}")
 
         if self.config.DRY_RUN:
             print("DRY RUN: Trade simulated.")
             trade = self.db_manager.add_trade(
-                symbol=self.symbol,
+                symbol=symbol,
                 side=signal,
                 entry_price=entry_price,
                 quantity=position_size,
@@ -91,18 +110,30 @@ class TradingBot:
                 take_profit=take_profit,
                 strategy="ScalpingStrategy"
             )
-            # Update SL/TP manually if DB manager supports it or update model 
-            # Since I added columns to model, I need to update DBManager.add_trade to accept them?
-            # Or just set them nicely.
-            # I will update DBManager.add_trade later or just ignore for now in this MVP script.
-            pass
         else:
             # Live execution logic
-            pass
+            try:
+                side = 'BUY' if signal == 'LONG' else 'SELL'
+                order = self.exchange.place_order(symbol, side, position_size, 'MARKET')
+                if order:
+                    self.db_manager.add_trade(
+                        symbol=symbol,
+                        side=signal,
+                        entry_price=entry_price,
+                        quantity=position_size,
+                        stop_loss=stop_loss,
+                        take_profit=take_profit,
+                        strategy="ScalpingStrategy"
+                    )
+            except Exception as e:
+                print(f"Error placing order for {symbol}: {e}")
 
-    def manage_open_trades(self, current_price):
+    def manage_open_trades_for_symbol(self, symbol, current_price):
+        """Manage open trades for a specific symbol."""
         open_trades = self.db_manager.get_open_trades()
         for trade in open_trades:
+            if trade.symbol != symbol:
+                continue
             if not trade.stop_loss or not trade.take_profit:
                 continue
 
@@ -125,19 +156,30 @@ class TradingBot:
                     exit_reason = "TP Hit"
             
             if should_close:
-                # Calculate PnL
+                # Calculate Gross PnL
                 if trade.side == 'LONG':
-                    pnl = (current_price - trade.entry_price) * trade.quantity
+                    gross_pnl = (current_price - trade.entry_price) * trade.quantity
                 else:
-                    pnl = (trade.entry_price - current_price) * trade.quantity
+                    gross_pnl = (trade.entry_price - current_price) * trade.quantity
                 
-                print(f"Closing Trade {trade.id} ({trade.symbol} {trade.side}): {exit_reason} at {current_price} | PnL: {pnl:.4f}")
+                # Calculate Fees (Entry + Exit)
+                # Fee = (Entry Value + Exit Value) * Fee Rate
+                entry_value = trade.entry_price * trade.quantity
+                exit_value = current_price * trade.quantity
+                fee = (entry_value + exit_value) * self.config.TRADING_FEE_RATE
+                
+                net_pnl = gross_pnl - fee
+                
+                print(f"📉 Closing {trade.symbol} {trade.side}: {exit_reason} at {current_price:.2f} | Gross PnL: {gross_pnl:.4f} | Fee: {fee:.4f} | Net PnL: {net_pnl:.4f}")
                 
                 if self.config.DRY_RUN:
-                    self.db_manager.close_trade(trade.id, current_price, pnl)
+                    self.db_manager.close_trade(trade.id, current_price, net_pnl)
                 else:
-                    # Live Close Logic: Place Market Order to close
-                    # close_side = SIDE_SELL if trade.side == 'LONG' else SIDE_BUY
-                    # order = self.exchange.place_order(trade.symbol, close_side, trade.quantity, 'MARKET')
-                    # if order: update db...
-                    pass
+                    # Live Close Logic
+                    try:
+                        close_side = 'SELL' if trade.side == 'LONG' else 'BUY'
+                        order = self.exchange.place_order(trade.symbol, close_side, trade.quantity, 'MARKET')
+                        if order:
+                            self.db_manager.close_trade(trade.id, current_price, net_pnl)
+                    except Exception as e:
+                        print(f"Error closing trade {trade.id}: {e}")

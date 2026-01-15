@@ -22,7 +22,7 @@
                 <div class="stat-value pnl-positive">${{ wallet_balance }}</div>
                 <div class="stat-label" style="margin-top: 5px; font-size: 12px;">USDT</div>
             </div>
-            <div class="card">
+            <div class="card status-card">
                 <div class="stat-label">Status</div>
                 <div class="stat-value" id="bot-status">
                     {% if state and state.is_running %}
@@ -31,20 +31,32 @@
                         <span class="status-stopped">STOPPED</span>
                     {% endif %}
                 </div>
-                <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                    <div class="input-group">
-                        <label for="leverage">Leverage</label>
-                        <div class="input-with-hint">
-                            <input type="number" id="leverage" value="{{ current_leverage }}" min="1" max="20" style="width: 60px;">
-                            <span class="hint">Suggested: 10x</span>
+                
+                <div class="trading-controls">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="usdt_amount">USDT Amount</label>
+                            <input type="number" id="usdt_amount" value="{{ position_size_usdt }}" min="1" max="10000" step="1" placeholder="100">
+                        </div>
+                        <div class="input-group">
+                            <label for="leverage">Leverage</label>
+                            <select id="leverage">
+                                <option value="3" {% if current_leverage == 3 %}selected{% endif %}>3x</option>
+                                <option value="5" {% if current_leverage == 5 %}selected{% endif %}>5x</option>
+                                <option value="10" {% if current_leverage == 10 %}selected{% endif %}>10x</option>
+                                <option value="15" {% if current_leverage == 15 %}selected{% endif %}>15x</option>
+                                <option value="20" {% if current_leverage == 20 %}selected{% endif %}>20x</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="input-group">
-                        <label for="position_size">Position %</label>
-                        <input type="number" id="position_size" value="{{ position_size_pct }}" min="0.1" max="100" step="0.1" style="width: 60px;">
+                    
+                    <div class="current-size" id="current-size">
+                        <span class="size-label">Position Size:</span>
+                        <span class="size-value" id="size-value">$<span id="calculated-size">{{ (position_size_usdt|float * current_leverage|float)|round(2) }}</span> USDT</span>
                     </div>
-                    <button class="btn" onclick="toggleBot()">
-                        {% if state and state.is_running %}Stop Bot{% else %}Start Bot{% endif %}
+                    
+                    <button class="btn btn-large" onclick="toggleBot()">
+                        {% if state and state.is_running %}🛑 Stop Bot{% else %}🚀 Start Bot{% endif %}
                     </button>
                 </div>
             </div>
@@ -88,7 +100,7 @@
                         <td>{{ trade.entry_price }}</td>
                         <td>{{ trade.quantity }}</td>
                         <td>-</td> <!-- Needs real-time update logic or fetched from DB if updated constantly -->
-                        <td>{{ trade.entry_time }}</td>
+                        <td>{{ trade.entry_time | gmt7 }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -110,8 +122,10 @@
                         <th>Symbol</th>
                         <th>Side</th>
                         <th>Result</th>
+                        <th>Position Size (USDT)</th>
                         <th>PnL</th>
-                        <th>Time</th>
+                        <th>Entry Time</th>
+                        <th>Closed Time</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -120,10 +134,12 @@
                         <td>{{ trade.symbol }}</td>
                         <td style="color: {% if trade.side == 'LONG' %}#4ade80{% else %}#f87171{% endif %}">{{ trade.side }}</td>
                         <td>{{ trade.status }}</td>
+                        <td>{{ (trade.entry_price * trade.quantity) | money }}</td>
                         <td class="{% if trade.pnl and trade.pnl > 0 %}pnl-positive{% elif trade.pnl and trade.pnl < 0 %}pnl-negative{% endif %}">
-                            {{ trade.pnl or '-' }}
+                            {{ trade.pnl | money }}
                         </td>
-                        <td>{{ trade.exit_time or trade.entry_time }}</td>
+                        <td>{{ trade.entry_time | gmt7 }}</td>
+                        <td>{{ trade.exit_time | gmt7 if trade.exit_time else '-' }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -135,6 +151,18 @@
     </div>
 
     <script>
+        // Calculate position size dynamically
+        function updatePositionSize() {
+            const usdt = parseFloat(document.getElementById('usdt_amount').value) || 0;
+            const leverage = parseFloat(document.getElementById('leverage').value) || 5;
+            const size = (usdt * leverage).toFixed(2);
+            document.getElementById('calculated-size').textContent = size;
+        }
+        
+        // Add event listeners for real-time calculation
+        document.getElementById('usdt_amount').addEventListener('input', updatePositionSize);
+        document.getElementById('leverage').addEventListener('change', updatePositionSize);
+        
         function toggleBot() {
             fetch('/api/toggle_bot', { method: 'POST' })
                 .then(response => response.json())
@@ -146,6 +174,9 @@
                     }
                 });
         }
+        
+        // Initialize on page load
+        updatePositionSize();
     </script>
 </body>
 </html>

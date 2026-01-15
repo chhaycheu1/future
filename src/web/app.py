@@ -12,6 +12,22 @@ app.config.from_object(Config)
 # Initialize DB
 db_manager = DBManager(app)
 
+# Custom Filters
+from datetime import timedelta
+
+@app.template_filter('gmt7')
+def gmt7_filter(dt):
+    if not dt:
+        return ""
+    # Add 7 hours to UTC time
+    return (dt + timedelta(hours=7)).strftime('%Y-%m-%d %H:%M:%S')
+
+@app.template_filter('money')
+def money_filter(value):
+    if value is None:
+        return "-"
+    return f"{float(value):.2f}"
+
 @app.route('/')
 def dashboard():
     state = db_manager.get_bot_state()
@@ -38,7 +54,7 @@ def dashboard():
     
     # Current settings
     current_leverage = getattr(Config, 'LEVERAGE', 5)
-    position_size_pct = getattr(Config, 'RISK_PER_TRADE', 0.01) * 100
+    position_size_usdt = getattr(Config, 'POSITION_SIZE_USDT', 100)
 
     return render_template('dashboard.html', 
                            state=state, 
@@ -49,7 +65,7 @@ def dashboard():
                            total_trades=total_trades,
                            wallet_balance=f"{wallet_balance:.2f}",
                            current_leverage=current_leverage,
-                           position_size_pct=f"{position_size_pct:.1f}")
+                           position_size_usdt=position_size_usdt)
 
 @app.route('/history')
 def history():
