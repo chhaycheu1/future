@@ -55,6 +55,11 @@ def dashboard():
     # Current settings
     current_leverage = getattr(Config, 'LEVERAGE', 5)
     position_size_usdt = getattr(Config, 'POSITION_SIZE_USDT', 100)
+    
+    # Configuration data
+    strategy_name = "Scalping Strategy"  # This could be dynamic if you have multiple strategies
+    timeframe = getattr(Config, 'TIMEFRAME', '1m')
+    trading_symbols = getattr(Config, 'SYMBOLS', [Config.SYMBOL])
 
     return render_template('dashboard.html', 
                            state=state, 
@@ -65,7 +70,10 @@ def dashboard():
                            total_trades=total_trades,
                            wallet_balance=f"{wallet_balance:.2f}",
                            current_leverage=current_leverage,
-                           position_size_usdt=position_size_usdt)
+                           position_size_usdt=position_size_usdt,
+                           strategy_name=strategy_name,
+                           timeframe=timeframe,
+                           trading_symbols=trading_symbols)
 
 @app.route('/history')
 def history():

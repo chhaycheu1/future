@@ -79,6 +79,34 @@
         </div>
 
         <div class="card">
+            <h2>📊 Current Configuration</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 15px;">
+                <div>
+                    <div class="stat-label">Strategy</div>
+                    <div class="stat-value" style="font-size: 18px; color: #60a5fa;">{{ strategy_name }}</div>
+                </div>
+                <div>
+                    <div class="stat-label">Timeframe</div>
+                    <div class="stat-value" style="font-size: 18px; color: #34d399;">{{ timeframe }}</div>
+                </div>
+                <div>
+                    <div class="stat-label">Monitored Pairs</div>
+                    <div class="stat-value" style="font-size: 18px; color: #fbbf24;">{{ trading_symbols|length }}</div>
+                </div>
+            </div>
+            <div style="margin-top: 20px;">
+                <div class="stat-label" style="margin-bottom: 10px;">Trading Pairs</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    {% for symbol in trading_symbols %}
+                    <span style="background: rgba(96, 165, 250, 0.2); color: #60a5fa; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500;">
+                        {{ symbol }}
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
             <h2>Active Positions</h2>
             {% if active_trades %}
             <table>
