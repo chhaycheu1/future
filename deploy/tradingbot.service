@@ -1,0 +1,14 @@
+[Unit]
+Description=Trading Bot Application
+After=network.target
+
+[Service]
+User=deployer
+Group=deployer
+WorkingDirectory=/var/www/trading-bot
+Environment="PATH=/var/www/trading-bot/venv/bin"
+ExecStart=/var/www/trading-bot/venv/bin/python main.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
