@@ -92,6 +92,39 @@ class BinanceClient:
         except BinanceAPIException as e:
             print(f"Error fetching position for {symbol}: {e}")
             return None
+    
+    def get_all_positions(self):
+        """Fetch all open positions from Binance Futures account."""
+        try:
+            account = self.client.futures_account()
+            open_positions = []
+            
+            for position in account['positions']:
+                amt = float(position['positionAmt'])
+                # Only include positions with non-zero amount
+                if amt != 0:
+                    entry_price = float(position['entryPrice'])
+                    unrealized_pnl = float(position['unrealizedProfit'])
+                    leverage = int(position['leverage'])
+                    notional = abs(amt * entry_price)
+                    
+                    open_positions.append({
+                        'symbol': position['symbol'],
+                        'side': 'LONG' if amt > 0 else 'SHORT',
+                        'amount': abs(amt),
+                        'entry_price': entry_price,
+                        'leverage': leverage,
+                        'notional': notional,  # Position size in USDT
+                        'unrealized_pnl': unrealized_pnl,
+                        'liquidation_price': float(position.get('liquidationPrice', 0)),
+                        'margin_type': position.get('marginType', 'cross')
+                    })
+            
+            return open_positions
+        except BinanceAPIException as e:
+            print(f"Error fetching all positions: {e}")
+            return []
+
 
     def place_order(self, symbol, side, quantity, order_type='MARKET', price=None):
         try:

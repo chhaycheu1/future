@@ -89,8 +89,17 @@ def get_status():
 def get_dashboard_data():
     """Get real-time dashboard data for auto-refresh."""
     try:
-        # Get trades
-        active_trades = db_manager.get_open_trades()
+        # Initialize exchange client
+        exchange = BinanceClient(
+            Config.BINANCE_API_KEY, 
+            Config.BINANCE_API_SECRET, 
+            testnet=getattr(Config, 'TESTNET', False)
+        )
+        
+        # Fetch LIVE positions from Binance (not from database)
+        live_positions = exchange.get_all_positions()
+        
+        # Fetch recent closed trades from database
         recent_trades = db_manager.get_recent_trades(limit=10)
         
         # Calculate stats
@@ -102,11 +111,6 @@ def get_dashboard_data():
         # Fetch wallet balance
         wallet_balance = 0.0
         try:
-            exchange = BinanceClient(
-                Config.BINANCE_API_KEY, 
-                Config.BINANCE_API_SECRET, 
-                testnet=getattr(Config, 'TESTNET', False)
-            )
             wallet_balance, _ = exchange.get_account_balance('USDT')
         except Exception as e:
             print(f"Error fetching wallet balance: {e}")
@@ -114,13 +118,17 @@ def get_dashboard_data():
         # Format trades for JSON
         from datetime import timedelta
         
+        # Format live positions from Binance
         active_trades_data = [{
-            'symbol': t.symbol,
-            'side': t.side,
-            'entry_price': float(t.entry_price) if t.entry_price else 0,
-            'quantity': float(t.quantity) if t.quantity else 0,
-            'entry_time': (t.entry_time + timedelta(hours=7)).strftime('%Y-%m-%d %H:%M:%S') if t.entry_time else ''
-        } for t in active_trades]
+            'symbol': p['symbol'],
+            'side': p['side'],
+            'entry_price': p['entry_price'],
+            'quantity': p['amount'],
+            'leverage': p['leverage'],
+            'notional': p['notional'],  # Position size in USDT
+            'unrealized_pnl': p['unrealized_pnl'],
+            'liquidation_price': p['liquidation_price']
+        } for p in live_positions]
         
         recent_trades_data = [{
             'symbol': t.symbol,

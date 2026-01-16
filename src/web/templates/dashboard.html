@@ -116,8 +116,9 @@
                         <th>Side</th>
                         <th>Entry Price</th>
                         <th>Quantity</th>
-                        <th>Current PnL (Unrealized)</th>
-                        <th>Time</th>
+                        <th>Leverage</th>
+                        <th>Position Size (USDT)</th>
+                        <th>Unrealized PnL</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -127,8 +128,11 @@
                         <td style="color: {% if trade.side == 'LONG' %}#4ade80{% else %}#f87171{% endif %}">{{ trade.side }}</td>
                         <td>{{ trade.entry_price }}</td>
                         <td>{{ trade.quantity }}</td>
-                        <td>-</td> <!-- Needs real-time update logic or fetched from DB if updated constantly -->
-                        <td>{{ trade.entry_time | gmt7 }}</td>
+                        <td>{{ trade.get('leverage', '-') }}x</td>
+                        <td>${{ trade.get('notional', 0)|float|round(2) }}</td>
+                        <td class="{% if trade.get('unrealized_pnl', 0)|float > 0 %}pnl-positive{% elif trade.get('unrealized_pnl', 0)|float < 0 %}pnl-negative{% endif %}">
+                            ${{ trade.get('unrealized_pnl', 0)|float|round(2) }}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -224,10 +228,11 @@
                                     <tr>
                                         <td>${t.symbol}</td>
                                         <td style="color: ${t.side === 'LONG' ? '#4ade80' : '#f87171'}">${t.side}</td>
-                                        <td>${t.entry_price}</td>
-                                        <td>${t.quantity}</td>
-                                        <td>-</td>
-                                        <td>${t.entry_time}</td>
+                                        <td>${parseFloat(t.entry_price).toFixed(4)}</td>
+                                        <td>${parseFloat(t.quantity).toFixed(4)}</td>
+                                        <td>${t.leverage}x</td>
+                                        <td>$${parseFloat(t.notional).toFixed(2)}</td>
+                                        <td class="${t.unrealized_pnl > 0 ? 'pnl-positive' : (t.unrealized_pnl < 0 ? 'pnl-negative' : '')}">$${parseFloat(t.unrealized_pnl).toFixed(2)}</td>
                                     </tr>
                                 `).join('');
                             } else {
