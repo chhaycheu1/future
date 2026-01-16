@@ -21,9 +21,13 @@ jobs:
           script: |
             cd /var/www/trading-bot
             
-            # Check if it's a git repo, if not clone it (first run)
+            # Check if it's a git repo, if not initialize it (handles non-empty dir like venv)
             if [ ! -d ".git" ]; then
-              git clone https://github.com/${{ github.repository }} .
+              git init
+              git remote add origin https://github.com/${{ github.repository }}
+              git fetch origin
+              git checkout -f main
+              git branch --set-upstream-to=origin/main main
             else
               git pull origin main
             fi
