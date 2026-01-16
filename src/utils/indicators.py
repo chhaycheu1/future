@@ -37,6 +37,26 @@ def atr(high: pd.Series, low: pd.Series, close: pd.Series, length: int = 14) -> 
     true_range = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
     return true_range.ewm(span=length, adjust=False).mean()
 
+def atr_percentile(atr_series: pd.Series, lookback: int = 100) -> pd.Series:
+    """Calculate ATR percentile rank over lookback period."""
+    return atr_series.rolling(window=lookback).apply(
+        lambda x: (x.iloc[-1] <= x).sum() / len(x) * 100 if len(x) > 0 else 50
+    )
+
+def ema_compression(ema_fast: pd.Series, ema_slow: pd.Series, atr: pd.Series) -> pd.Series:
+    """
+    Detect EMA compression (ranging market).
+    Returns ratio of EMA distance to ATR. Low values indicate compression.
+    """
+    return ((ema_fast - ema_slow).abs() / atr).replace([np.inf, -np.inf], 0)
+
+def volume_strength(volume: pd.Series, vol_ma_fast: pd.Series, vol_ma_slow: pd.Series) -> pd.Series:
+    """
+    Calculate volume strength ratio.
+    Returns current volume / slow MA ratio. High values indicate strong participation.
+    """
+    return (vol_ma_fast / vol_ma_slow).replace([np.inf, -np.inf], 1)
+
 def calculate_indicators(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculates technical indicators for the strategy.
@@ -67,8 +87,14 @@ def calculate_indicators(df: pd.DataFrame) -> pd.DataFrame:
     
     # Volume MA
     df['vol_ma'] = sma(df['volume'], length=20)
+    df['vol_ma_slow'] = sma(df['volume'], length=50)
     
     # ATR for stop loss
     df['atr'] = atr(df['high'], df['low'], df['close'], length=14)
+    
+    # Regime Filters (NEW)
+    df['atr_percentile'] = atr_percentile(df['atr'], lookback=100)
+    df['ema_compression'] = ema_compression(df['ema_fast'], df['ema_slow'], df['atr'])
+    df['volume_strength'] = volume_strength(df['volume'], df['vol_ma'], df['vol_ma_slow'])
 
     return df

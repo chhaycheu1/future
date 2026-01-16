@@ -107,6 +107,38 @@
         </div>
 
         <div class="card">
+            <h2>🎯 Strategy Performance</h2>
+            <table style="margin-top: 15px;">
+                <thead>
+                    <tr>
+                        <th>Strategy</th>
+                        <th>Total Trades</th>
+                        <th>Win Rate</th>
+                        <th>Net PnL (USDT)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="color: #60a5fa; font-weight: 500;">ScalpingStrategy</td>
+                        <td>{{ strategy_stats['ScalpingStrategy']['total_trades'] }}</td>
+                        <td>{{ strategy_stats['ScalpingStrategy']['win_rate'] }}%</td>
+                        <td class="{% if strategy_stats['ScalpingStrategy']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['ScalpingStrategy']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
+                            ${{ strategy_stats['ScalpingStrategy']['net_pnl'] }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="color: #34d399; font-weight: 500;">SmartScalpingStrategy</td>
+                        <td>{{ strategy_stats['SmartScalpingStrategy']['total_trades'] }}</td>
+                        <td>{{ strategy_stats['SmartScalpingStrategy']['win_rate'] }}%</td>
+                        <td class="{% if strategy_stats['SmartScalpingStrategy']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['SmartScalpingStrategy']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
+                            ${{ strategy_stats['SmartScalpingStrategy']['net_pnl'] }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
             <h2>Active Positions</h2>
             {% if active_trades %}
             <table>

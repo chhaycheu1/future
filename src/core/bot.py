@@ -3,6 +3,7 @@ import threading
 from datetime import datetime
 from ..exchange.binance_client import BinanceClient
 from ..strategy.scalping_strategy import ScalpingStrategy
+from ..strategy.smart_scalping_strategy import SmartScalpingStrategy
 from ..core.risk_manager import RiskManager
 from ..database.db_manager import DBManager
 
@@ -12,7 +13,13 @@ class TradingBot:
         self.db_manager = db_manager
         self.exchange = BinanceClient(config.BINANCE_API_KEY, config.BINANCE_API_SECRET, testnet=config.TESTNET)
         self.risk_manager = RiskManager(config, db_manager)
-        self.strategy = ScalpingStrategy(self.risk_manager)
+        
+        # Initialize MULTIPLE strategies
+        self.strategies = [
+            ("ScalpingStrategy", ScalpingStrategy(self.risk_manager)),
+            ("SmartScalpingStrategy", SmartScalpingStrategy(self.risk_manager))
+        ]
+        
         self.symbols = getattr(config, 'SYMBOLS', [config.SYMBOL])  # Use SYMBOLS list or fallback to single SYMBOL
         self.timeframe = config.TIMEFRAME
         self.is_running = False
@@ -51,30 +58,32 @@ class TradingBot:
             time.sleep(10) # Poll every 10 seconds
 
     def process_symbol(self, symbol):
-        """Process a single symbol for signals."""
+        """Process a single symbol for signals across ALL strategies."""
         try:
             # 1. Fetch Data
             df = self.exchange.get_historical_klines(symbol, self.timeframe, limit=205)
             if df.empty:
                 return
 
-            # 2. Analyze Strategy
             current_price = df['close'].iloc[-1]
-            signal, entry_price, stop_loss, take_profit = self.strategy.analyze(df)
             
-            # 3. Check for Exits (Manage Open Trades for this symbol)
+            # 2. Check for Exits (Manage Open Trades for this symbol)
             self.manage_open_trades_for_symbol(symbol, current_price)
 
-            # 4. Execute New Trade
-            if signal != 'NONE':
-                self.execute_trade(symbol, signal, entry_price, stop_loss, take_profit)
+            # 3. Run EACH strategy
+            for strategy_name, strategy in self.strategies:
+                signal, entry_price, stop_loss, take_profit = strategy.analyze(df)
+                
+                # 4. Execute New Trade
+                if signal != 'NONE':
+                    self.execute_trade(symbol, signal, entry_price, stop_loss, take_profit, strategy_name)
         except Exception as e:
             print(f"Error processing {symbol}: {e}")
 
-    def execute_trade(self, symbol, signal, entry_price, stop_loss, take_profit):
+    def execute_trade(self, symbol, signal, entry_price, stop_loss, take_profit, strategy_name):
         open_trades = self.db_manager.get_open_trades()
-        # Ensure only one trade per symbol
-        if any(t.symbol == symbol for t in open_trades):
+        # Ensure only one trade per symbol PER STRATEGY
+        if any(t.symbol == symbol and t.strategy == strategy_name for t in open_trades):
             return
 
         # Risk Checks
@@ -97,7 +106,7 @@ class TradingBot:
         if position_size <= 0:
             return
         
-        print(f"📈 {symbol} {signal} | Entry: {entry_price:.2f} | SL: {stop_loss:.2f} | TP: {take_profit:.2f} | Size: {position_size}")
+        print(f"📈 [{strategy_name}] {symbol} {signal} | Entry: {entry_price:.2f} | SL: {stop_loss:.2f} | TP: {take_profit:.2f} | Size: {position_size}")
 
         if self.config.DRY_RUN:
             print("DRY RUN: Trade simulated.")
@@ -108,7 +117,7 @@ class TradingBot:
                 quantity=position_size,
                 stop_loss=stop_loss,
                 take_profit=take_profit,
-                strategy="ScalpingStrategy"
+                strategy=strategy_name
             )
         else:
             # Live execution logic
@@ -123,7 +132,7 @@ class TradingBot:
                         quantity=position_size,
                         stop_loss=stop_loss,
                         take_profit=take_profit,
-                        strategy="ScalpingStrategy"
+                        strategy=strategy_name
                     )
             except Exception as e:
                 print(f"Error placing order for {symbol}: {e}")

@@ -49,8 +49,29 @@ def dashboard():
     # Calculate some stats
     total_trades = Trade.query.filter(Trade.status == 'CLOSED').count()
     winning_trades = Trade.query.filter(Trade.pnl > 0).count()
-    win_rate = (winning_trades / total_trades * 100) if total_trades > 0 else 0
+    win_rate = (winning_trades / total_trades *100) if total_trades > 0 else 0
     total_pnl = sum([t.pnl for t in Trade.query.filter(Trade.status == 'CLOSED').all() if t.pnl])
+    
+    # PER-STRATEGY STATS (NEW)
+    strategy_stats = {}
+    for strategy_name in ["ScalpingStrategy", "SmartScalpingStrategy"]:
+        strategy_trades = Trade.query.filter(Trade.status == 'CLOSED', Trade.strategy == strategy_name).all()
+        if strategy_trades:
+            strategy_total = len(strategy_trades)
+            strategy_wins = sum(1 for t in strategy_trades if t.pnl and t.pnl > 0)
+            strategy_pnl = sum([t.pnl for t in strategy_trades if t.pnl])
+            strategy_win_rate = (strategy_wins / strategy_total * 100) if strategy_total > 0 else 0
+            strategy_stats[strategy_name] = {
+                'total_trades': strategy_total,
+                'win_rate': f"{strategy_win_rate:.2f}",
+                'net_pnl': f"{strategy_pnl:.2f}"
+            }
+        else:
+            strategy_stats[strategy_name] = {
+                'total_trades': 0,
+                'win_rate': "0.00",
+                'net_pnl': "0.00"
+            }
     
     # Fetch wallet balance
     wallet_balance = 0.0
@@ -80,7 +101,8 @@ def dashboard():
                            position_size_usdt=position_size_usdt,
                            strategy_name=strategy_name,
                            timeframe=timeframe,
-                           trading_symbols=trading_symbols)
+                           trading_symbols=trading_symbols,
+                           strategy_stats=strategy_stats)
 
 @app.route('/history')
 def history():
