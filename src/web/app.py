@@ -31,7 +31,19 @@ def money_filter(value):
 @app.route('/')
 def dashboard():
     state = db_manager.get_bot_state()
-    active_trades = db_manager.get_open_trades()
+    
+    # Fetch LIVE positions from Binance instead of database
+    live_positions = []
+    try:
+        exchange = BinanceClient(
+            Config.BINANCE_API_KEY, 
+            Config.BINANCE_API_SECRET, 
+            testnet=getattr(Config, 'TESTNET', False)
+        )
+        live_positions = exchange.get_all_positions()
+    except Exception as e:
+        print(f"Error fetching live positions: {e}")
+    
     recent_trades = db_manager.get_recent_trades(limit=10)
     
     # Calculate some stats
@@ -43,11 +55,6 @@ def dashboard():
     # Fetch wallet balance
     wallet_balance = 0.0
     try:
-        exchange = BinanceClient(
-            Config.BINANCE_API_KEY, 
-            Config.BINANCE_API_SECRET, 
-            testnet=getattr(Config, 'TESTNET', False)
-        )
         wallet_balance, _ = exchange.get_account_balance('USDT')
     except Exception as e:
         print(f"Error fetching wallet balance: {e}")
@@ -63,7 +70,7 @@ def dashboard():
 
     return render_template('dashboard.html', 
                            state=state, 
-                           active_trades=active_trades, 
+                           active_trades=live_positions,  # Now using live Binance positions
                            recent_trades=recent_trades,
                            win_rate=f"{win_rate:.2f}",
                            total_pnl=f"{total_pnl:.2f}",
