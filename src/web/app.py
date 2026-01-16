@@ -85,6 +85,68 @@ def get_status():
     state = db_manager.get_bot_state()
     return jsonify(state.to_dict() if state else {})
 
+@app.route('/api/dashboard_data', methods=['GET'])
+def get_dashboard_data():
+    """Get real-time dashboard data for auto-refresh."""
+    try:
+        # Get trades
+        active_trades = db_manager.get_open_trades()
+        recent_trades = db_manager.get_recent_trades(limit=10)
+        
+        # Calculate stats
+        total_trades = Trade.query.filter(Trade.status == 'CLOSED').count()
+        winning_trades = Trade.query.filter(Trade.pnl > 0).count()
+        win_rate = (winning_trades / total_trades * 100) if total_trades > 0 else 0
+        total_pnl = sum([t.pnl for t in Trade.query.filter(Trade.status == 'CLOSED').all() if t.pnl])
+        
+        # Fetch wallet balance
+        wallet_balance = 0.0
+        try:
+            exchange = BinanceClient(
+                Config.BINANCE_API_KEY, 
+                Config.BINANCE_API_SECRET, 
+                testnet=getattr(Config, 'TESTNET', False)
+            )
+            wallet_balance, _ = exchange.get_account_balance('USDT')
+        except Exception as e:
+            print(f"Error fetching wallet balance: {e}")
+        
+        # Format trades for JSON
+        from datetime import timedelta
+        
+        active_trades_data = [{
+            'symbol': t.symbol,
+            'side': t.side,
+            'entry_price': float(t.entry_price) if t.entry_price else 0,
+            'quantity': float(t.quantity) if t.quantity else 0,
+            'entry_time': (t.entry_time + timedelta(hours=7)).strftime('%Y-%m-%d %H:%M:%S') if t.entry_time else ''
+        } for t in active_trades]
+        
+        recent_trades_data = [{
+            'symbol': t.symbol,
+            'side': t.side,
+            'status': t.status,
+            'position_size': float(t.entry_price * t.quantity) if (t.entry_price and t.quantity) else 0,
+            'pnl': float(t.pnl) if t.pnl else 0,
+            'entry_time': (t.entry_time + timedelta(hours=7)).strftime('%Y-%m-%d %H:%M:%S') if t.entry_time else '',
+            'exit_time': (t.exit_time + timedelta(hours=7)).strftime('%Y-%m-%d %H:%M:%S') if t.exit_time else '-'
+        } for t in recent_trades]
+        
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'wallet_balance': f"{wallet_balance:.2f}",
+                'total_pnl': f"{total_pnl:.2f}",
+                'win_rate': f"{win_rate:.2f}",
+                'total_trades': total_trades,
+                'active_trades': active_trades_data,
+                'recent_trades': recent_trades_data
+            }
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
 @app.route('/api/toggle_bot', methods=['POST'])
 def toggle_bot():
     state = db_manager.get_bot_state()

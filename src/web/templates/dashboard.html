@@ -203,8 +203,68 @@
                 });
         }
         
+        // Auto-refresh dashboard data
+        function refreshDashboardData() {
+            fetch('/api/dashboard_data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const d = data.data;
+                        
+                        // Update stats
+                        document.querySelector('.stats-grid .card:nth-child(1) .stat-value').textContent = '$' + d.wallet_balance;
+                        document.querySelector('.stats-grid .card:nth-child(4) .stat-value').textContent = '$' + d.total_pnl;
+                        document.querySelector('.stats-grid .card:nth-child(5) .stat-value').textContent = d.win_rate + '%';
+                        
+                        // Update active positions table
+                        const activeTable = document.querySelector('.card:has(h2:contains("Active Positions")) tbody');
+                        if (activeTable) {
+                            if (d.active_trades.length > 0) {
+                                activeTable.innerHTML = d.active_trades.map(t => `
+                                    <tr>
+                                        <td>${t.symbol}</td>
+                                        <td style="color: ${t.side === 'LONG' ? '#4ade80' : '#f87171'}">${t.side}</td>
+                                        <td>${t.entry_price}</td>
+                                        <td>${t.quantity}</td>
+                                        <td>-</td>
+                                        <td>${t.entry_time}</td>
+                                    </tr>
+                                `).join('');
+                            } else {
+                                activeTable.parentElement.innerHTML = '<p style="color: #94a3b8;">No active positions.</p>';
+                            }
+                        }
+                        
+                        // Update recent activities table
+                        const recentTable = document.querySelector('.card:has(h2:contains("Recent Activities")) tbody');
+                        if (recentTable) {
+                            if (d.recent_trades.length > 0) {
+                                recentTable.innerHTML = d.recent_trades.map(t => `
+                                    <tr>
+                                        <td>${t.symbol}</td>
+                                        <td style="color: ${t.side === 'LONG' ? '#4ade80' : '#f87171'}">${t.side}</td>
+                                        <td>${t.status}</td>
+                                        <td>${t.position_size.toFixed(2)}</td>
+                                        <td class="${t.pnl > 0 ? 'pnl-positive' : (t.pnl < 0 ? 'pnl-negative' : '')}">${t.pnl.toFixed(2)}</td>
+                                        <td>${t.entry_time}</td>
+                                        <td>${t.exit_time}</td>
+                                    </tr>
+                                `).join('');
+                            }
+                        }
+                    }
+                })
+                .catch(err => console.error('Error fetching dashboard data:', err));
+        }
+        
         // Initialize on page load
         updatePositionSize();
+        
+        // Auto-refresh every 5 seconds
+        setInterval(refreshDashboardData, 5000);
+        
+        // Initial load
+        refreshDashboardData();
     </script>
 </body>
 </html>
