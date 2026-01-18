@@ -54,7 +54,7 @@ def dashboard():
     
     # PER-STRATEGY STATS
     strategy_stats = {}
-    for strategy_name in ["ScalpingStrategy", "SmartScalpingStrategy", "ScalpingStrategyV2", "TrendPullbackStrategy", "RangeSweepStrategy"]:
+    for strategy_name in ["ScalpingStrategy", "SmartScalpingStrategy", "TrendPullbackStrategy", "RangeSweepStrategy"]:
         strategy_trades = Trade.query.filter(Trade.status == 'CLOSED', Trade.strategy == strategy_name).all()
         if strategy_trades:
             strategy_total = len(strategy_trades)

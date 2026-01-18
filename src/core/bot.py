@@ -3,7 +3,6 @@ import threading
 from datetime import datetime
 from ..exchange.binance_client import BinanceClient
 from ..strategy.scalping_strategy import ScalpingStrategy
-from ..strategy.scalping_strategy_v2 import ScalpingStrategyV2
 from ..strategy.smart_scalping_strategy import SmartScalpingStrategy
 from ..strategy.trend_pullback_strategy import TrendPullbackStrategy
 from ..strategy.range_sweep_strategy import RangeSweepStrategy
@@ -21,7 +20,6 @@ class TradingBot:
         self.strategies = [
             ("ScalpingStrategy", ScalpingStrategy(self.risk_manager)),
             ("SmartScalpingStrategy", SmartScalpingStrategy(self.risk_manager)),
-            ("ScalpingStrategyV2", ScalpingStrategyV2(self.risk_manager)),
             ("TrendPullbackStrategy", TrendPullbackStrategy(self.risk_manager)),
             ("RangeSweepStrategy", RangeSweepStrategy(self.risk_manager))
         ]
