@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binance Scalping Bot - Reports</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .report-section {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+
+        .report-section h3 {
+            margin-top: 0;
+            color: #94a3b8;
+            font-size: 16px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .filter-bar {
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-bar select,
+        .filter-bar button {
+            padding: 8px 12px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #e2e8f0;
+            cursor: pointer;
+        }
+
+        .filter-bar button {
+            background: #3b82f6;
+            border-color: #2563eb;
+            font-weight: 600;
+        }
+
+        .filter-bar button:hover {
+            background: #2563eb;
+        }
+
+        table.report-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table.report-table th,
+        table.report-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #334155;
+            font-size: 14px;
+        }
+
+        table.report-table th {
+            color: #94a3b8;
+        }
+
+        .pnl-positive {
+            color: #4ade80;
+            font-weight: 600;
+        }
+
+        .pnl-negative {
+            color: #f87171;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Binance Scalping Bot</h1>
+            <nav>
+                <a href="/" class="nav-link">Dashboard</a>
+                <a href="/history" class="nav-link">History</a>
+                <a href="/reports" class="nav-link active">Reports</a>
+            </nav>
+        </header>
+
+        <div class="filter-bar">
+            <div>
+                <label style="color: #94a3b8; margin-right: 5px;">Strategy:</label>
+                <select id="strategyFilter">
+                    <option value="all">All Strategies</option>
+                    <option value="ScalpingStrategy">ScalpingStrategy</option>
+                    <option value="SmartScalpingStrategy">SmartScalpingStrategy</option>
+                    <option value="TrendPullbackStrategy">TrendPullbackStrategy</option>
+                    <option value="RangeSweepStrategy">RangeSweepStrategy</option>
+                </select>
+            </div>
+            <button onclick="loadReport()">Update Report</button>
+        </div>
+
+        <div class="report-grid">
+            <!-- Overall Stats -->
+            <div class="report-section">
+                <h3>Overall Performance</h3>
+                <div style="text-align: center; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <div style="font-size: 24px; font-weight: bold;" id="total-trades">-</div>
+                        <div style="color: #94a3b8; font-size: 12px;">Total Trades</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 24px; font-weight: bold;" id="win-rate">-</div>
+                        <div style="color: #94a3b8; font-size: 12px;">Win Rate</div>
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <div style="font-size: 32px; font-weight: bold;" id="total-pnl">-</div>
+                        <div style="color: #94a3b8; font-size: 12px;">Net PnL</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PnL by Side -->
+            <div class="report-section">
+                <h3>Performance by Side</h3>
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th>Side</th>
+                            <th>Trades</th>
+                            <th>Win Rate</th>
+                            <th>PnL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="side-pnl-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="report-grid">
+            <!-- PnL by Symbol -->
+            <div class="report-section">
+                <h3>Performance by Symbol</h3>
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Trades</th>
+                            <th>Win Rate</th>
+                            <th>PnL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="symbol-pnl-body"></tbody>
+                </table>
+            </div>
+
+            <!-- PnL by Strategy (if filter is 'all') -->
+            <div class="report-section" id="strategy-section">
+                <h3>Performance by Strategy</h3>
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th>Strategy</th>
+                            <th>Trades</th>
+                            <th>Win Rate</th>
+                            <th>PnL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="strategy-pnl-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function loadReport() {
+            const strategy = document.getElementById('strategyFilter').value;
+
+            fetch(`/api/reports_data?strategy=${strategy}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        renderReport(data.data);
+                    } else {
+                        alert('Error loading report data');
+                    }
+                })
+                .catch(err => console.error(err));
+        }
+
+        function renderReport(data) {
+            // Overall
+            document.getElementById('total-trades').textContent = data.total_trades;
+            document.getElementById('win-rate').textContent = data.win_rate + '%';
+            const pnlEl = document.getElementById('total-pnl');
+            pnlEl.textContent = '$' + data.total_pnl.toFixed(2);
+            pnlEl.className = data.total_pnl >= 0 ? 'pnl-positive' : 'pnl-negative';
+
+            // By Side
+            const sideBody = document.getElementById('side-pnl-body');
+            sideBody.innerHTML = data.by_side.map(row => `
+                <tr>
+                    <td style="color: ${row.side === 'LONG' ? '#4ade80' : '#f87171'}">${row.side}</td>
+                    <td>${row.count}</td>
+                    <td>${row.win_rate}%</td>
+                    <td class="${row.pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">$${row.pnl.toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            // By Symbol
+            const symbolBody = document.getElementById('symbol-pnl-body');
+            symbolBody.innerHTML = data.by_symbol.map(row => `
+                <tr>
+                    <td>${row.symbol}</td>
+                    <td>${row.count}</td>
+                    <td>${row.win_rate}%</td>
+                    <td class="${row.pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">$${row.pnl.toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            // By Strategy
+            const strategySection = document.getElementById('strategy-section');
+            if (document.getElementById('strategyFilter').value === 'all') {
+                strategySection.style.display = 'block';
+                const strategyBody = document.getElementById('strategy-pnl-body');
+                strategyBody.innerHTML = data.by_strategy.map(row => `
+                    <tr>
+                        <td>${row.strategy}</td>
+                        <td>${row.count}</td>
+                        <td>${row.win_rate}%</td>
+                        <td class="${row.pnl >= 0 ? 'pnl-positive' : 'pnl-negative'}">$${row.pnl.toFixed(2)}</td>
+                    </tr>
+                `).join('');
+            } else {
+                strategySection.style.display = 'none';
+            }
+        }
+
+        // Initial load
+        loadReport();
+    </script>
+</body>
+
+</html>

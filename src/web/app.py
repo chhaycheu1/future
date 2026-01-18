@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify, request
 from ..database.db_manager import DBManager
 from ..database.models import Trade, BotState, db
+from sqlalchemy import func
 from ..core.backtest import BacktestEngine
 from ..exchange.binance_client import BinanceClient
 from config.settings import Config
@@ -254,6 +255,96 @@ def clear_history():
         return jsonify({'status': 'success', 'message': 'Trade history cleared.'})
     except Exception as e:
         db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/reports')
+def reports():
+    return render_template('reports.html')
+
+@app.route('/api/reports_data')
+def get_reports_data():
+    try:
+        strategy_filter = request.args.get('strategy', 'all')
+        
+        # Base query
+        query = Trade.query
+        
+        # Apply filter
+        if strategy_filter != 'all':
+            query = query.filter(Trade.strategy == strategy_filter)
+            
+        trades = query.all()
+        
+        if not trades:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'total_trades': 0,
+                    'win_rate': 0.0,
+                    'total_pnl': 0.0,
+                    'by_side': [],
+                    'by_symbol': [],
+                    'by_strategy': []
+                }
+            })
+
+        # --- Aggregations ---
+        
+        # Overall
+        total_trades = len(trades)
+        winning_trades = sum(1 for t in trades if t.pnl and t.pnl > 0)
+        total_pnl = sum(t.pnl for t in trades if t.pnl)
+        win_rate = (winning_trades / total_trades * 100) if total_trades > 0 else 0
+        
+        # Helper for grouping
+        def get_stats(group_key_func):
+            stats = {}
+            for t in trades:
+                key = group_key_func(t)
+                if key not in stats:
+                    stats[key] = {'count': 0, 'pnl': 0.0, 'wins': 0}
+                
+                stats[key]['count'] += 1
+                if t.pnl:
+                    stats[key]['pnl'] += t.pnl
+                    if t.pnl > 0:
+                        stats[key]['wins'] += 1
+            
+            result = []
+            for key, val in stats.items():
+                wr = (val['wins'] / val['count'] * 100) if val['count'] > 0 else 0
+                result.append({
+                    'symbol': key if group_key_func == lambda x: x.symbol else None,
+                    'side': key if group_key_func == lambda x: x.side else None,
+                    'strategy': key if group_key_func == lambda x: x.strategy else None,
+                    'count': val['count'],
+                    'pnl': val['pnl'],
+                    'win_rate': round(wr, 2)
+                })
+            return result
+
+        # By Side
+        by_side = get_stats(lambda t: t.side)
+        
+        # By Symbol
+        by_symbol = get_stats(lambda t: t.symbol)
+        
+        # By Strategy
+        by_strategy = get_stats(lambda t: t.strategy)
+        
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'total_trades': total_trades,
+                'win_rate': round(win_rate, 2),
+                'total_pnl': round(total_pnl, 2),
+                'by_side': by_side,
+                'by_symbol': by_symbol,
+                'by_strategy': by_strategy
+            }
+        })
+
+    except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 def run_server():

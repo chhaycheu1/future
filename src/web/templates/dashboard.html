@@ -12,9 +12,9 @@
     <div class="container">
         <header>
             <h1>Binance Scalping Bot</h1>
-            <nav>
-                <a href="/" class="nav-link active">Dashboard</a>
-                <a href="/history" class="nav-link">History</a>
+            <a href="/" class="nav-link active">Dashboard</a>
+            <a href="/history" class="nav-link">History</a>
+            <a href="/reports" class="nav-link">Reports</a>
             </nav>
         </header>
 
@@ -296,6 +296,7 @@
                                     <tr>
                                         <td>${t.symbol}</td>
                                         <td style="color: ${t.side === 'LONG' ? '#4ade80' : '#f87171'}">${t.side}</td>
+                                        <td style="color: #94a3b8; font-size: 12px;">${t.strategy || '-'}</td>
                                         <td>${parseFloat(t.entry_price).toFixed(4)}</td>
                                         <td>${parseFloat(t.quantity).toFixed(4)}</td>
                                         <td>${t.leverage}x</td>
@@ -314,6 +315,7 @@
                                 <tr>
                                     <td>${t.symbol}</td>
                                     <td style="color: ${t.side === 'LONG' ? '#4ade80' : '#f87171'}">${t.side}</td>
+                                    <td style="color: #94a3b8; font-size: 12px;">${t.strategy || '-'}</td>
                                     <td>${t.status}</td>
                                     <td>${t.position_size.toFixed(2)}</td>
                                     <td class="${t.pnl > 0 ? 'pnl-positive' : (t.pnl < 0 ? 'pnl-negative' : '')}">${t.pnl.toFixed(2)}</td>
