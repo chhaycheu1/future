@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, request
 from ..database.db_manager import DBManager
 from ..database.models import Trade, BotState, db
-from sqlalchemy import func
+
 from ..core.backtest import BacktestEngine
 from ..exchange.binance_client import BinanceClient
 from config.settings import Config

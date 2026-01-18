@@ -11,12 +11,14 @@ from collections import defaultdict
 from datetime import datetime
 import pandas as pd
 
-try:
-    from binance import ThreadedWebsocketManager
     USE_BINANCE_WS = True
 except ImportError:
     USE_BINANCE_WS = False
-    import websocket
+    try:
+        import websocket
+    except ImportError:
+        websocket = None
+        print("Warning: websocket-client not installed. WebSocket features will be disabled.")
 
 # WebSocket endpoints
 TESTNET_WS_URL = "wss://stream.binancefuture.com/ws"
@@ -139,6 +141,11 @@ class BinanceWebSocket:
     
     def _connect(self):
         """Establish WebSocket connection."""
+        if not websocket:
+            print("Cannot connect: websocket-client library is not installed.")
+            self.running = False
+            return
+
         url = self._build_stream_url()
         
         self.ws = websocket.WebSocketApp(
