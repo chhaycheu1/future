@@ -11,6 +11,8 @@ from collections import defaultdict
 from datetime import datetime
 import pandas as pd
 
+try:
+    from binance import ThreadedWebsocketManager
     USE_BINANCE_WS = True
 except ImportError:
     USE_BINANCE_WS = False
