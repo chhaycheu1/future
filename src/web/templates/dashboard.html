@@ -173,6 +173,7 @@
                     <tr>
                         <th>Symbol</th>
                         <th>Side</th>
+                        <th>Strategy</th>
                         <th>Entry Price</th>
                         <th>Quantity</th>
                         <th>Leverage</th>
@@ -186,6 +187,7 @@
                         <td>{{ trade.symbol }}</td>
                         <td style="color: {% if trade.side == 'LONG' %}#4ade80{% else %}#f87171{% endif %}">{{
                             trade.side }}</td>
+                        <td style="color: #94a3b8; font-size: 12px;">{{ trade.get('strategy', '-') }}</td>
                         <td>{{ trade.entry_price }}</td>
                         <td>{{ trade.quantity }}</td>
                         <td>{{ trade.get('leverage', '-') }}x</td>
@@ -214,6 +216,7 @@
                     <tr>
                         <th>Symbol</th>
                         <th>Side</th>
+                        <th>Strategy</th>
                         <th>Result</th>
                         <th>Position Size (USDT)</th>
                         <th>PnL</th>
@@ -227,6 +230,7 @@
                         <td>{{ trade.symbol }}</td>
                         <td style="color: {% if trade.side == 'LONG' %}#4ade80{% else %}#f87171{% endif %}">{{
                             trade.side }}</td>
+                        <td style="color: #94a3b8; font-size: 12px;">{{ trade.strategy or '-' }}</td>
                         <td>{{ trade.status }}</td>
                         <td>{{ (trade.entry_price * trade.quantity) | money }}</td>
                         <td
