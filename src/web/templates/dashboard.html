@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Binance Scalping Bot - Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -26,35 +28,37 @@
                 <div class="stat-label">Status</div>
                 <div class="stat-value" id="bot-status">
                     {% if state and state.is_running %}
-                        <span class="status-running">RUNNING</span>
+                    <span class="status-running">RUNNING</span>
                     {% else %}
-                        <span class="status-stopped">STOPPED</span>
+                    <span class="status-stopped">STOPPED</span>
                     {% endif %}
                 </div>
-                
+
                 <div class="trading-controls">
                     <div class="input-row">
                         <div class="input-group">
                             <label for="usdt_amount">USDT Amount</label>
-                            <input type="number" id="usdt_amount" value="{{ position_size_usdt }}" min="1" max="10000" step="1" placeholder="100">
+                            <input type="number" id="usdt_amount" value="{{ position_size_usdt }}" min="1" max="10000"
+                                step="1" placeholder="100">
                         </div>
                         <div class="input-group">
                             <label for="leverage">Leverage</label>
                             <select id="leverage">
-                                <option value="3" {% if current_leverage == 3 %}selected{% endif %}>3x</option>
-                                <option value="5" {% if current_leverage == 5 %}selected{% endif %}>5x</option>
-                                <option value="10" {% if current_leverage == 10 %}selected{% endif %}>10x</option>
-                                <option value="15" {% if current_leverage == 15 %}selected{% endif %}>15x</option>
-                                <option value="20" {% if current_leverage == 20 %}selected{% endif %}>20x</option>
+                                <option value="3" {% if current_leverage==3 %}selected{% endif %}>3x</option>
+                                <option value="5" {% if current_leverage==5 %}selected{% endif %}>5x</option>
+                                <option value="10" {% if current_leverage==10 %}selected{% endif %}>10x</option>
+                                <option value="15" {% if current_leverage==15 %}selected{% endif %}>15x</option>
+                                <option value="20" {% if current_leverage==20 %}selected{% endif %}>20x</option>
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="current-size" id="current-size">
                         <span class="size-label">Position Size:</span>
-                        <span class="size-value" id="size-value">$<span id="calculated-size">{{ (position_size_usdt|float * current_leverage|float)|round(2) }}</span> USDT</span>
+                        <span class="size-value" id="size-value">$<span id="calculated-size">{{
+                                (position_size_usdt|float * current_leverage|float)|round(2) }}</span> USDT</span>
                     </div>
-                    
+
                     <button class="btn btn-large" onclick="toggleBot()">
                         {% if state and state.is_running %}🛑 Stop Bot{% else %}🚀 Start Bot{% endif %}
                     </button>
@@ -68,7 +72,8 @@
             </div>
             <div class="card">
                 <div class="stat-label">Total PnL</div>
-                <div class="stat-value {% if total_pnl|float > 0 %}pnl-positive{% elif total_pnl|float < 0 %}pnl-negative{% endif %}">
+                <div
+                    class="stat-value {% if total_pnl|float > 0 %}pnl-positive{% elif total_pnl|float < 0 %}pnl-negative{% endif %}">
                     ${{ total_pnl }}
                 </div>
             </div>
@@ -80,7 +85,8 @@
 
         <div class="card">
             <h2>📊 Current Configuration</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 15px;">
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 15px;">
                 <div>
                     <div class="stat-label">Strategy</div>
                     <div class="stat-value" style="font-size: 18px; color: #60a5fa;">{{ strategy_name }}</div>
@@ -98,7 +104,8 @@
                 <div class="stat-label" style="margin-bottom: 10px;">Trading Pairs</div>
                 <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                     {% for symbol in trading_symbols %}
-                    <span style="background: rgba(96, 165, 250, 0.2); color: #60a5fa; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500;">
+                    <span
+                        style="background: rgba(96, 165, 250, 0.2); color: #60a5fa; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500;">
                         {{ symbol }}
                     </span>
                     {% endfor %}
@@ -122,7 +129,8 @@
                         <td style="color: #60a5fa; font-weight: 500;">ScalpingStrategy</td>
                         <td>{{ strategy_stats['ScalpingStrategy']['total_trades'] }}</td>
                         <td>{{ strategy_stats['ScalpingStrategy']['win_rate'] }}%</td>
-                        <td class="{% if strategy_stats['ScalpingStrategy']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['ScalpingStrategy']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
+                        <td
+                            class="{% if strategy_stats['ScalpingStrategy']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['ScalpingStrategy']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
                             ${{ strategy_stats['ScalpingStrategy']['net_pnl'] }}
                         </td>
                     </tr>
@@ -130,7 +138,8 @@
                         <td style="color: #34d399; font-weight: 500;">SmartScalpingStrategy</td>
                         <td>{{ strategy_stats['SmartScalpingStrategy']['total_trades'] }}</td>
                         <td>{{ strategy_stats['SmartScalpingStrategy']['win_rate'] }}%</td>
-                        <td class="{% if strategy_stats['SmartScalpingStrategy']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['SmartScalpingStrategy']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
+                        <td
+                            class="{% if strategy_stats['SmartScalpingStrategy']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['SmartScalpingStrategy']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
                             ${{ strategy_stats['SmartScalpingStrategy']['net_pnl'] }}
                         </td>
                     </tr>
@@ -141,7 +150,7 @@
         <div class="card">
             <h2>Active Positions</h2>
             {% if active_trades %}
-            <table>
+            <table id="active-positions-table">
                 <thead>
                     <tr>
                         <th>Symbol</th>
@@ -157,12 +166,14 @@
                     {% for trade in active_trades %}
                     <tr>
                         <td>{{ trade.symbol }}</td>
-                        <td style="color: {% if trade.side == 'LONG' %}#4ade80{% else %}#f87171{% endif %}">{{ trade.side }}</td>
+                        <td style="color: {% if trade.side == 'LONG' %}#4ade80{% else %}#f87171{% endif %}">{{
+                            trade.side }}</td>
                         <td>{{ trade.entry_price }}</td>
                         <td>{{ trade.quantity }}</td>
                         <td>{{ trade.get('leverage', '-') }}x</td>
                         <td>${{ trade.get('notional', 0)|float|round(2) }}</td>
-                        <td class="{% if trade.get('unrealized_pnl', 0)|float > 0 %}pnl-positive{% elif trade.get('unrealized_pnl', 0)|float < 0 %}pnl-negative{% endif %}">
+                        <td
+                            class="{% if trade.get('unrealized_pnl', 0)|float > 0 %}pnl-positive{% elif trade.get('unrealized_pnl', 0)|float < 0 %}pnl-negative{% endif %}">
                             ${{ trade.get('unrealized_pnl', 0)|float|round(2) }}
                         </td>
                     </tr>
@@ -172,7 +183,7 @@
             {% else %}
             <p style="color: #94a3b8;">No active positions.</p>
             {% endif %}
-            
+
             <!-- Real-time position from Exchange (if available in State) -->
             <!-- Ideally, the bot updates the DB with open positions periodically -->
         </div>
@@ -180,7 +191,7 @@
         <div class="card">
             <h2>Recent Activities</h2>
             {% if recent_trades %}
-            <table>
+            <table id="recent-activities-table">
                 <thead>
                     <tr>
                         <th>Symbol</th>
@@ -196,10 +207,12 @@
                     {% for trade in recent_trades %}
                     <tr>
                         <td>{{ trade.symbol }}</td>
-                        <td style="color: {% if trade.side == 'LONG' %}#4ade80{% else %}#f87171{% endif %}">{{ trade.side }}</td>
+                        <td style="color: {% if trade.side == 'LONG' %}#4ade80{% else %}#f87171{% endif %}">{{
+                            trade.side }}</td>
                         <td>{{ trade.status }}</td>
                         <td>{{ (trade.entry_price * trade.quantity) | money }}</td>
-                        <td class="{% if trade.pnl and trade.pnl > 0 %}pnl-positive{% elif trade.pnl and trade.pnl < 0 %}pnl-negative{% endif %}">
+                        <td
+                            class="{% if trade.pnl and trade.pnl > 0 %}pnl-positive{% elif trade.pnl and trade.pnl < 0 %}pnl-negative{% endif %}">
                             {{ trade.pnl | money }}
                         </td>
                         <td>{{ trade.entry_time | gmt7 }}</td>
@@ -222,11 +235,11 @@
             const size = (usdt * leverage).toFixed(2);
             document.getElementById('calculated-size').textContent = size;
         }
-        
+
         // Add event listeners for real-time calculation
         document.getElementById('usdt_amount').addEventListener('input', updatePositionSize);
         document.getElementById('leverage').addEventListener('change', updatePositionSize);
-        
+
         function toggleBot() {
             fetch('/api/toggle_bot', { method: 'POST' })
                 .then(response => response.json())
@@ -238,7 +251,7 @@
                     }
                 });
         }
-        
+
         // Auto-refresh dashboard data
         function refreshDashboardData() {
             fetch('/api/dashboard_data')
@@ -246,17 +259,18 @@
                 .then(data => {
                     if (data.status === 'success') {
                         const d = data.data;
-                        
+
                         // Update stats
                         document.querySelector('.stats-grid .card:nth-child(1) .stat-value').textContent = '$' + d.wallet_balance;
                         document.querySelector('.stats-grid .card:nth-child(4) .stat-value').textContent = '$' + d.total_pnl;
                         document.querySelector('.stats-grid .card:nth-child(5) .stat-value').textContent = d.win_rate + '%';
-                        
+
                         // Update active positions table
-                        const activeTable = document.querySelector('.card:has(h2:contains("Active Positions")) tbody');
-                        if (activeTable) {
+                        const activeTable = document.getElementById('active-positions-table');
+                        const activeBody = activeTable ? activeTable.querySelector('tbody') : null;
+                        if (activeBody) {
                             if (d.active_trades.length > 0) {
-                                activeTable.innerHTML = d.active_trades.map(t => `
+                                activeBody.innerHTML = d.active_trades.map(t => `
                                     <tr>
                                         <td>${t.symbol}</td>
                                         <td style="color: ${t.side === 'LONG' ? '#4ade80' : '#f87171'}">${t.side}</td>
@@ -264,44 +278,42 @@
                                         <td>${parseFloat(t.quantity).toFixed(4)}</td>
                                         <td>${t.leverage}x</td>
                                         <td>$${parseFloat(t.notional).toFixed(2)}</td>
-                                        <td class="${t.unrealized_pnl > 0 ? 'pnl-positive' : (t.unrealized_pnl < 0 ? 'pnl-negative' : '')}">$${parseFloat(t.unrealized_pnl).toFixed(2)}</td>
+                                        <td class="${t.unrealized_pnl > 0 ? 'pnl-positive' : (t.unrealized_pnl < 0 ? 'pnl-negative' : '')}">${parseFloat(t.unrealized_pnl).toFixed(2)}</td>
                                     </tr>
                                 `).join('');
-                            } else {
-                                activeTable.parentElement.innerHTML = '<p style="color: #94a3b8;">No active positions.</p>';
                             }
                         }
-                        
+
                         // Update recent activities table
-                        const recentTable = document.querySelector('.card:has(h2:contains("Recent Activities")) tbody');
-                        if (recentTable) {
-                            if (d.recent_trades.length > 0) {
-                                recentTable.innerHTML = d.recent_trades.map(t => `
-                                    <tr>
-                                        <td>${t.symbol}</td>
-                                        <td style="color: ${t.side === 'LONG' ? '#4ade80' : '#f87171'}">${t.side}</td>
-                                        <td>${t.status}</td>
-                                        <td>${t.position_size.toFixed(2)}</td>
-                                        <td class="${t.pnl > 0 ? 'pnl-positive' : (t.pnl < 0 ? 'pnl-negative' : '')}">${t.pnl.toFixed(2)}</td>
-                                        <td>${t.entry_time}</td>
-                                        <td>${t.exit_time}</td>
-                                    </tr>
-                                `).join('');
-                            }
+                        const recentTable = document.getElementById('recent-activities-table');
+                        const recentBody = recentTable ? recentTable.querySelector('tbody') : null;
+                        if (recentBody && d.recent_trades.length > 0) {
+                            recentBody.innerHTML = d.recent_trades.map(t => `
+                                <tr>
+                                    <td>${t.symbol}</td>
+                                    <td style="color: ${t.side === 'LONG' ? '#4ade80' : '#f87171'}">${t.side}</td>
+                                    <td>${t.status}</td>
+                                    <td>${t.position_size.toFixed(2)}</td>
+                                    <td class="${t.pnl > 0 ? 'pnl-positive' : (t.pnl < 0 ? 'pnl-negative' : '')}">${t.pnl.toFixed(2)}</td>
+                                    <td>${t.entry_time}</td>
+                                    <td>${t.exit_time}</td>
+                                </tr>
+                            `).join('');
                         }
                     }
                 })
                 .catch(err => console.error('Error fetching dashboard data:', err));
         }
-        
+
         // Initialize on page load
         updatePositionSize();
-        
+
         // Auto-refresh every 5 seconds
         setInterval(refreshDashboardData, 5000);
-        
+
         // Initial load
         refreshDashboardData();
     </script>
 </body>
+
 </html>
