@@ -297,10 +297,10 @@ def get_reports_data():
         win_rate = (winning_trades / total_trades * 100) if total_trades > 0 else 0
         
         # Helper for grouping
-        def get_stats(group_key_func):
+        def get_stats(field_name):
             stats = {}
             for t in trades:
-                key = group_key_func(t)
+                key = getattr(t, field_name)
                 if key not in stats:
                     stats[key] = {'count': 0, 'pnl': 0.0, 'wins': 0}
                 
@@ -314,9 +314,9 @@ def get_reports_data():
             for key, val in stats.items():
                 wr = (val['wins'] / val['count'] * 100) if val['count'] > 0 else 0
                 result.append({
-                    'symbol': key if group_key_func == lambda x: x.symbol else None,
-                    'side': key if group_key_func == lambda x: x.side else None,
-                    'strategy': key if group_key_func == lambda x: x.strategy else None,
+                    'symbol': key if field_name == 'symbol' else None,
+                    'side': key if field_name == 'side' else None,
+                    'strategy': key if field_name == 'strategy' else None,
                     'count': val['count'],
                     'pnl': val['pnl'],
                     'win_rate': round(wr, 2)
@@ -324,13 +324,13 @@ def get_reports_data():
             return result
 
         # By Side
-        by_side = get_stats(lambda t: t.side)
+        by_side = get_stats('side')
         
         # By Symbol
-        by_symbol = get_stats(lambda t: t.symbol)
+        by_symbol = get_stats('symbol')
         
         # By Strategy
-        by_strategy = get_stats(lambda t: t.strategy)
+        by_strategy = get_stats('strategy')
         
         return jsonify({
             'status': 'success',
