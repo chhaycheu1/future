@@ -3,7 +3,10 @@ import threading
 from datetime import datetime
 from ..exchange.binance_client import BinanceClient
 from ..strategy.scalping_strategy import ScalpingStrategy
+from ..strategy.scalping_strategy_v2 import ScalpingStrategyV2
 from ..strategy.smart_scalping_strategy import SmartScalpingStrategy
+from ..strategy.trend_pullback_strategy import TrendPullbackStrategy
+from ..strategy.range_sweep_strategy import RangeSweepStrategy
 from ..core.risk_manager import RiskManager
 from ..database.db_manager import DBManager
 
@@ -14,10 +17,13 @@ class TradingBot:
         self.exchange = BinanceClient(config.BINANCE_API_KEY, config.BINANCE_API_SECRET, testnet=config.TESTNET)
         self.risk_manager = RiskManager(config, db_manager)
         
-        # Initialize MULTIPLE strategies
+        # Initialize MULTIPLE strategies (running in parallel)
         self.strategies = [
             ("ScalpingStrategy", ScalpingStrategy(self.risk_manager)),
-            ("SmartScalpingStrategy", SmartScalpingStrategy(self.risk_manager))
+            ("SmartScalpingStrategy", SmartScalpingStrategy(self.risk_manager)),
+            ("ScalpingStrategyV2", ScalpingStrategyV2(self.risk_manager)),
+            ("TrendPullbackStrategy", TrendPullbackStrategy(self.risk_manager)),
+            ("RangeSweepStrategy", RangeSweepStrategy(self.risk_manager))
         ]
         
         self.symbols = getattr(config, 'SYMBOLS', [config.SYMBOL])  # Use SYMBOLS list or fallback to single SYMBOL

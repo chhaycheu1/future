@@ -52,9 +52,9 @@ def dashboard():
     win_rate = (winning_trades / total_trades *100) if total_trades > 0 else 0
     total_pnl = sum([t.pnl for t in Trade.query.filter(Trade.status == 'CLOSED').all() if t.pnl])
     
-    # PER-STRATEGY STATS (NEW)
+    # PER-STRATEGY STATS
     strategy_stats = {}
-    for strategy_name in ["ScalpingStrategy", "SmartScalpingStrategy"]:
+    for strategy_name in ["ScalpingStrategy", "SmartScalpingStrategy", "ScalpingStrategyV2", "TrendPullbackStrategy", "RangeSweepStrategy"]:
         strategy_trades = Trade.query.filter(Trade.status == 'CLOSED', Trade.strategy == strategy_name).all()
         if strategy_trades:
             strategy_total = len(strategy_trades)

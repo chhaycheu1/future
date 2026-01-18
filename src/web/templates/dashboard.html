@@ -143,6 +143,33 @@
                             ${{ strategy_stats['SmartScalpingStrategy']['net_pnl'] }}
                         </td>
                     </tr>
+                    <tr>
+                        <td style="color: #818cf8; font-weight: 500;">ScalpingStrategyV2</td>
+                        <td>{{ strategy_stats['ScalpingStrategyV2']['total_trades'] }}</td>
+                        <td>{{ strategy_stats['ScalpingStrategyV2']['win_rate'] }}%</td>
+                        <td
+                            class="{% if strategy_stats['ScalpingStrategyV2']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['ScalpingStrategyV2']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
+                            ${{ strategy_stats['ScalpingStrategyV2']['net_pnl'] }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="color: #fbbf24; font-weight: 500;">TrendPullbackStrategy</td>
+                        <td>{{ strategy_stats['TrendPullbackStrategy']['total_trades'] }}</td>
+                        <td>{{ strategy_stats['TrendPullbackStrategy']['win_rate'] }}%</td>
+                        <td
+                            class="{% if strategy_stats['TrendPullbackStrategy']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['TrendPullbackStrategy']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
+                            ${{ strategy_stats['TrendPullbackStrategy']['net_pnl'] }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="color: #f472b6; font-weight: 500;">RangeSweepStrategy</td>
+                        <td>{{ strategy_stats['RangeSweepStrategy']['total_trades'] }}</td>
+                        <td>{{ strategy_stats['RangeSweepStrategy']['win_rate'] }}%</td>
+                        <td
+                            class="{% if strategy_stats['RangeSweepStrategy']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['RangeSweepStrategy']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
+                            ${{ strategy_stats['RangeSweepStrategy']['net_pnl'] }}
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>

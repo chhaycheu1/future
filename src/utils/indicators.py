@@ -74,6 +74,8 @@ def calculate_indicators(df: pd.DataFrame) -> pd.DataFrame:
     df['ema_fast'] = ema(df['close'], length=9)
     df['ema_slow'] = ema(df['close'], length=21)
     df['ema_trend'] = ema(df['close'], length=200)
+    df['ema_20'] = ema(df['close'], length=20)
+    df['ema_50'] = ema(df['close'], length=50)
     
     # VWAP - Set datetime index if needed
     if not isinstance(df.index, pd.DatetimeIndex):
