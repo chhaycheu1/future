@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +14,9 @@
             flex-wrap: wrap;
             margin-bottom: 20px;
         }
-        .backtest-controls input, .backtest-controls select {
+
+        .backtest-controls input,
+        .backtest-controls select {
             padding: 10px 15px;
             border: 1px solid #334155;
             border-radius: 8px;
@@ -21,15 +24,18 @@
             color: #e2e8f0;
             font-size: 14px;
         }
+
         .backtest-controls label {
             color: #94a3b8;
             font-size: 14px;
         }
+
         .backtest-controls .input-group {
             display: flex;
             flex-direction: column;
             gap: 5px;
         }
+
         .btn {
             padding: 12px 24px;
             border: none;
@@ -39,31 +45,38 @@
             font-size: 14px;
             transition: all 0.3s ease;
         }
+
         .btn-primary {
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: white;
         }
+
         .btn-primary:hover {
             background: linear-gradient(135deg, #60a5fa, #3b82f6);
             transform: translateY(-2px);
         }
+
         .btn-danger {
             background: linear-gradient(135deg, #ef4444, #b91c1c);
             color: white;
         }
+
         .btn-danger:hover {
             background: linear-gradient(135deg, #f87171, #ef4444);
         }
+
         .btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
         }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
             margin-bottom: 25px;
         }
+
         .stat-card {
             background: linear-gradient(135deg, #1e293b, #0f172a);
             padding: 20px;
@@ -71,50 +84,66 @@
             text-align: center;
             border: 1px solid #334155;
         }
+
         .stat-value {
             font-size: 24px;
             font-weight: 700;
             color: #f8fafc;
         }
+
         .stat-label {
             font-size: 12px;
             color: #94a3b8;
             margin-top: 5px;
             text-transform: uppercase;
         }
-        .stat-positive { color: #4ade80; }
-        .stat-negative { color: #f87171; }
+
+        .stat-positive {
+            color: #4ade80;
+        }
+
+        .stat-negative {
+            color: #f87171;
+        }
+
         .loading {
             display: none;
             color: #60a5fa;
             font-style: italic;
         }
+
         .message {
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
             display: none;
         }
+
         .message.success {
             background: rgba(74, 222, 128, 0.1);
             border: 1px solid #4ade80;
             color: #4ade80;
         }
+
         .message.error {
             background: rgba(248, 113, 113, 0.1);
             border: 1px solid #f87171;
             color: #f87171;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
         }
-        th, td {
+
+        th,
+        td {
             padding: 12px;
             text-align: left;
             border-bottom: 1px solid #334155;
         }
+
         th {
             background: #1e293b;
             color: #94a3b8;
@@ -122,13 +151,23 @@
             text-transform: uppercase;
             font-size: 12px;
         }
+
         tr:hover {
             background: rgba(59, 130, 246, 0.1);
         }
-        .pnl-positive { color: #4ade80; font-weight: 600; }
-        .pnl-negative { color: #f87171; font-weight: 600; }
+
+        .pnl-positive {
+            color: #4ade80;
+            font-weight: 600;
+        }
+
+        .pnl-negative {
+            color: #f87171;
+            font-weight: 600;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -139,46 +178,24 @@
             </nav>
         </header>
 
-        <div class="card">
-            <h2>Backtest Strategy</h2>
-            <div id="message" class="message"></div>
-            
-            <div class="backtest-controls">
-                <div class="input-group">
-                    <label for="symbol">Symbol</label>
-                    <input type="text" id="symbol" value="BTCUSDT" placeholder="e.g. BTCUSDT">
-                </div>
-                <div class="input-group">
-                    <label for="interval">Timeframe</label>
-                    <select id="interval">
-                        <option value="1m">1 minute</option>
-                        <option value="5m">5 minutes</option>
-                        <option value="15m" selected>15 minutes</option>
-                        <option value="1h">1 hour</option>
-                        <option value="4h">4 hours</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="days">Days</label>
-                    <input type="number" id="days" value="30" min="1" max="90">
-                </div>
-                <button id="runBacktest" class="btn btn-primary" onclick="runBacktest()">
-                    🚀 Run Backtest
-                </button>
-                <button id="clearHistory" class="btn btn-danger" onclick="clearHistory()">
-                    🗑️ Clear History
-                </button>
-            </div>
-            <p id="loading" class="loading">⏳ Running backtest... This may take a minute...</p>
-        </div>
 
-        <div id="stats-container" class="card" style="display: none;">
-            <h2>Backtest Results</h2>
-            <div class="stats-grid" id="stats-grid"></div>
-        </div>
 
         <div class="card">
             <h2>Trade History</h2>
+
+            <div class="backtest-controls" style="margin-bottom: 15px;">
+                <div class="input-group">
+                    <label for="strategyFilter">Filter by Strategy</label>
+                    <select id="strategyFilter" onchange="filterByStrategy()">
+                        <option value="all">All Strategies</option>
+                        <option value="ScalpingStrategy">ScalpingStrategy</option>
+                        <option value="SmartScalpingStrategy">SmartScalpingStrategy</option>
+                        <option value="TrendPullbackStrategy">TrendPullbackStrategy</option>
+                        <option value="RangeSweepStrategy">RangeSweepStrategy</option>
+                    </select>
+                </div>
+            </div>
+
             {% if trades %}
             <table>
                 <thead>
@@ -200,11 +217,13 @@
                     <tr>
                         <td>{{ trade.id }}</td>
                         <td>{{ trade.symbol }}</td>
-                        <td style="color: {% if trade.side == 'LONG' %}#4ade80{% else %}#f87171{% endif %}">{{ trade.side }}</td>
+                        <td style="color: {% if trade.side == 'LONG' %}#4ade80{% else %}#f87171{% endif %}">{{
+                            trade.side }}</td>
                         <td>${{ "%.2f"|format(trade.entry_price) }}</td>
                         <td>{% if trade.exit_price %}${{ "%.2f"|format(trade.exit_price) }}{% else %}-{% endif %}</td>
                         <td>{{ "%.6f"|format(trade.quantity) }}</td>
-                        <td class="{% if trade.pnl and trade.pnl > 0 %}pnl-positive{% elif trade.pnl and trade.pnl < 0 %}pnl-negative{% endif %}">
+                        <td
+                            class="{% if trade.pnl and trade.pnl > 0 %}pnl-positive{% elif trade.pnl and trade.pnl < 0 %}pnl-negative{% endif %}">
                             {% if trade.pnl %}${{ "%.2f"|format(trade.pnl) }}{% else %}-{% endif %}
                         </td>
                         <td>{{ trade.entry_time.strftime('%Y-%m-%d %H:%M') if trade.entry_time else '-' }}</td>
@@ -215,111 +234,28 @@
                 </tbody>
             </table>
             {% else %}
-            <p style="color: #94a3b8;">No trade history. Run a backtest to see results!</p>
+            <p style="color: #94a3b8;">No trade history yet.</p>
             {% endif %}
         </div>
     </div>
 
     <script>
-        function showMessage(text, type) {
-            const msg = document.getElementById('message');
-            msg.textContent = text;
-            msg.className = 'message ' + type;
-            msg.style.display = 'block';
-            setTimeout(() => msg.style.display = 'none', 5000);
-        }
+        function filterByStrategy() {
+            const filter = document.getElementById('strategyFilter').value;
+            const rows = document.querySelectorAll('tbody tr');
 
-        async function runBacktest() {
-            const btn = document.getElementById('runBacktest');
-            const loading = document.getElementById('loading');
-            
-            btn.disabled = true;
-            loading.style.display = 'block';
-            
-            const data = {
-                symbol: document.getElementById('symbol').value,
-                interval: document.getElementById('interval').value,
-                days: parseInt(document.getElementById('days').value)
-            };
-            
-            try {
-                const response = await fetch('/api/backtest', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(data)
-                });
-                
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    showMessage(result.message, 'success');
-                    displayStats(result.stats);
-                    setTimeout(() => location.reload(), 1500);
+            rows.forEach(row => {
+                const strategyCell = row.cells[row.cells.length - 1]; // Last column is Strategy
+                const strategy = strategyCell ? strategyCell.textContent.trim() : '';
+
+                if (filter === 'all' || strategy === filter) {
+                    row.style.display = '';
                 } else {
-                    showMessage(result.message, 'error');
+                    row.style.display = 'none';
                 }
-            } catch (error) {
-                showMessage('Error: ' + error.message, 'error');
-            } finally {
-                btn.disabled = false;
-                loading.style.display = 'none';
-            }
-        }
-
-        function displayStats(stats) {
-            const container = document.getElementById('stats-container');
-            const grid = document.getElementById('stats-grid');
-            
-            container.style.display = 'block';
-            grid.innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-value">${stats.total_trades}</div>
-                    <div class="stat-label">Total Trades</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value stat-positive">${stats.winning_trades}</div>
-                    <div class="stat-label">Winning</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value stat-negative">${stats.losing_trades}</div>
-                    <div class="stat-label">Losing</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${stats.win_rate}</div>
-                    <div class="stat-label">Win Rate</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value ${parseFloat(stats.total_pnl.replace('$','')) >= 0 ? 'stat-positive' : 'stat-negative'}">${stats.total_pnl}</div>
-                    <div class="stat-label">Total PnL</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${stats.final_balance}</div>
-                    <div class="stat-label">Final Balance</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value ${parseFloat(stats.return_pct) >= 0 ? 'stat-positive' : 'stat-negative'}">${stats.return_pct}</div>
-                    <div class="stat-label">Return</div>
-                </div>
-            `;
-        }
-
-        async function clearHistory() {
-            if (!confirm('Are you sure you want to clear all trade history?')) return;
-            
-            try {
-                const response = await fetch('/api/clear_history', {method: 'POST'});
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    showMessage(result.message, 'success');
-                    setTimeout(() => location.reload(), 1000);
-                } else {
-                    showMessage(result.message, 'error');
-                }
-            } catch (error) {
-                showMessage('Error: ' + error.message, 'error');
-            }
+            });
         }
     </script>
 </body>
+
 </html>
