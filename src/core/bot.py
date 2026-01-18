@@ -2,6 +2,7 @@ import time
 import threading
 from datetime import datetime
 from ..exchange.binance_client import BinanceClient
+from ..exchange.websocket_manager import BinanceWebSocket, WebSocketDataProvider
 from ..strategy.scalping_strategy import ScalpingStrategy
 from ..strategy.smart_scalping_strategy import SmartScalpingStrategy
 from ..strategy.trend_pullback_strategy import TrendPullbackStrategy
@@ -24,10 +25,34 @@ class TradingBot:
             ("RangeSweepStrategy", RangeSweepStrategy(self.risk_manager))
         ]
         
-        self.symbols = getattr(config, 'SYMBOLS', [config.SYMBOL])  # Use SYMBOLS list or fallback to single SYMBOL
+        self.symbols = getattr(config, 'SYMBOLS', [config.SYMBOL])
         self.timeframe = config.TIMEFRAME
         self.is_running = False
         self._stop_event = threading.Event()
+        
+        # WebSocket for real-time data
+        self.ws_manager = None
+        self.data_provider = None
+        self.use_websocket = getattr(config, 'USE_WEBSOCKET', True)
+
+    def _on_candle_close(self, symbol, df):
+        """Callback when a candle closes - run strategy analysis immediately."""
+        if not self.is_running or df.empty:
+            return
+        
+        try:
+            current_price = df['close'].iloc[-1]
+            
+            # Check for exits
+            self.manage_open_trades_for_symbol(symbol, current_price)
+            
+            # Run strategies
+            for strategy_name, strategy in self.strategies:
+                signal, entry_price, stop_loss, take_profit = strategy.analyze(df)
+                if signal != 'NONE':
+                    self.execute_trade(symbol, signal, entry_price, stop_loss, take_profit, strategy_name)
+        except Exception as e:
+            print(f"Error processing {symbol} on candle close: {e}")
 
     def start(self):
         self.is_running = True
@@ -35,15 +60,38 @@ class TradingBot:
         print(f"Bot started for {len(self.symbols)} pairs on {self.timeframe} timeframe.")
         print(f"Pairs: {', '.join(self.symbols)}")
         self.db_manager.update_bot_state(is_running=True)
+        
+        # Initialize WebSocket
+        if self.use_websocket:
+            try:
+                self.ws_manager = BinanceWebSocket(
+                    symbols=self.symbols,
+                    timeframe=self.timeframe,
+                    testnet=self.config.TESTNET,
+                    on_candle_close=self._on_candle_close
+                )
+                self.ws_manager.start()
+                self.data_provider = WebSocketDataProvider(self.exchange, self.ws_manager)
+                print("🚀 WebSocket mode enabled - real-time data streaming")
+            except Exception as e:
+                print(f"⚠️ WebSocket init failed: {e}, falling back to HTTP polling")
+                self.use_websocket = False
+        
         self.run_loop()
 
     def stop(self):
         self.is_running = False
         self._stop_event.set()
         print("Bot stopping...")
+        
+        # Stop WebSocket
+        if self.ws_manager:
+            self.ws_manager.stop()
+        
         self.db_manager.update_bot_state(is_running=False)
 
     def run_loop(self):
+        """Main loop - with WebSocket, this mainly handles exits and health checks."""
         while not self._stop_event.is_set():
             state = self.db_manager.get_bot_state()
             if state and not state.is_running:
@@ -51,21 +99,35 @@ class TradingBot:
                 break
             
             try:
-                # Scan all symbols
+                # In WebSocket mode: strategies are triggered by candle close callback
+                # This loop just handles periodic tasks and fallback
                 for symbol in self.symbols:
                     if self._stop_event.is_set():
                         break
-                    self.process_symbol(symbol)
+                    
+                    # Always check for exits with current price
+                    if self.ws_manager and self.ws_manager.is_ready(symbol):
+                        current_price = self.ws_manager.get_current_price(symbol)
+                        if current_price:
+                            self.manage_open_trades_for_symbol(symbol, current_price)
+                    else:
+                        # Fallback to HTTP if WebSocket data not ready
+                        self.process_symbol(symbol)
+                        
             except Exception as e:
                 print(f"Error in main loop: {e}")
             
-            time.sleep(10) # Poll every 10 seconds
+            # Sleep less in WebSocket mode since callbacks handle most work
+            time.sleep(5 if self.use_websocket else 10)
 
     def process_symbol(self, symbol):
-        """Process a single symbol for signals across ALL strategies."""
+        """Process a single symbol (HTTP fallback mode)."""
         try:
-            # 1. Fetch Data
-            df = self.exchange.get_historical_klines(symbol, self.timeframe, limit=205)
+            # Get data from provider (WebSocket cache or HTTP)
+            if self.data_provider:
+                df = self.data_provider.get_candles(symbol, self.timeframe, limit=205)
+            else:
+                df = self.exchange.get_historical_klines(symbol, self.timeframe, limit=205)
             if df.empty:
                 return
 

@@ -4,3 +4,4 @@ ta
 python-dotenv
 flask
 flask-sqlalchemy
+websocket-client
