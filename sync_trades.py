@@ -75,8 +75,9 @@ def fetch_and_analyze():
     else:
         print("No PnL generating trades found.")
         
-    print("\n--- RECENT TRADES ---")
-    print(df[['time', 'symbol', 'side', 'price', 'qty', 'realizedPnl', 'commission']].tail(20).to_string())
+    print("\n--- CSV DATA (COPY BELOW) ---")
+    print(df.to_csv(index=False))
+    print("--- END CSV DATA ---")
 
 if __name__ == "__main__":
     fetch_and_analyze()
