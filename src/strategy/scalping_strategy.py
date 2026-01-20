@@ -4,67 +4,95 @@ from ..utils.indicators import calculate_indicators
 class ScalpingStrategy:
     def __init__(self, risk_manager):
         self.risk_manager = risk_manager
+        
+        # DATA-DRIVEN FIXES based on 169 real trades
+        # Symbol Blacklist: These 5 symbols lost $116.71 (67% of all losses)
+        self.SYMBOL_BLACKLIST = [
+            'FILUSDT',   # Lost -$32.35
+            'OPUSDT',    # Lost -$28.48
+            'XRPUSDT',   # Lost -$20.61
+            'DOGEUSDT',  # Lost -$19.27
+            'ETHUSDT'    # Lost -$16.00
+        ]
+        
+        # Regime Filters
+        self.MIN_ATR_PERCENTILE = 40  # Skip low volatility (bottom 40%)
+        self.MIN_VOLUME_STRENGTH = 1.2  # Require strong volume
 
-    def analyze(self, df: pd.DataFrame):
+    def analyze(self, df: pd.DataFrame, symbol=None):
         """
-        Analyzes the latest candle data and returns a signal.
-        Returns:
-            signal (str): 'LONG', 'SHORT', or 'NONE'
-            entry_price (float)
-            stop_loss (float)
-            take_profit (float)
+        FIXED ScalpingStrategy based on real trading data analysis.
+        
+        Key Improvements:
+        - Symbol blacklist (removed -$116 loss sources)
+        - LONG pullback entries (was 19.61% WR, targeting 35%+)
+        - 2.0x R:R (was 1.5x)
+        - ATR regime filter
+        - Stricter LONG requirements
         """
         if len(df) < 200:
+            return 'NONE', 0, 0, 0
+        
+        # FIX 1: Symbol Blacklist
+        if symbol and symbol in self.SYMBOL_BLACKLIST:
             return 'NONE', 0, 0, 0
 
         df = calculate_indicators(df)
         last_row = df.iloc[-1]
         prev_row = df.iloc[-2]
         
-        # --- Strategy Logic ---
+        # FIX 2: Market Regime Filter (ATR)
+        if last_row['atr_percentile'] < self.MIN_ATR_PERCENTILE:
+            return 'NONE', 0, 0, 0  # Skip low volatility
         
-        # 1. Trend Filter: Price > EMA 200 (Long) / Price < EMA 200 (Short)
-        # 2. Volume Check: Current Volume > Volume MA * 1.5 (Strong move)
-        # 3. Momentum: RSI between 40 and 60 is chop? 
-        #    User said: "Avoid chop / low-volume markets". "RSI for momentum".
-        #    - Long: RSI > 50 and rising.
-        #    - Short: RSI < 50 and falling.
-        # 4. Entry:
-        #    - Long: Price crosses above EMA 9 and EMA 9 > EMA 21
-        #    - Short: Price crosses below EMA 9 and EMA 9 < EMA 21
-        #    - VWAP Confluence: Price > VWAP (Long), Price < VWAP (Short)
-
+        # FIX 3: Volume Strength Filter
+        if last_row['volume_strength'] < self.MIN_VOLUME_STRENGTH:
+            return 'NONE', 0, 0, 0  # Skip weak volume
+        
         signal = 'NONE'
         
-        # LONG Condition
+        # FIX 4: IMPROVED LONG LOGIC (was 19.61% WR)
         if (
-            last_row['close'] > last_row['ema_trend'] and # Trend Up
-            last_row['close'] > last_row['vwap'] and      # Above VWAP
-            last_row['ema_fast'] > last_row['ema_slow'] and # Fast EMA > Slow EMA
-            last_row['rsi'] > 50 and                   # Bullish Momentum
-            last_row['volume'] > last_row['vol_ma']    # Volume confirmation
+            # Basic trend filter
+            last_row['close'] > last_row['ema_trend'] and
+            last_row['close'] > last_row['vwap'] and
+            last_row['ema_fast'] > last_row['ema_slow'] and
+            last_row['volume'] > last_row['vol_ma']
         ):
-            # Check for fresh cross or breakout
-            # Example: previous close was below fast ema or fast ema was below slow ema?
-            # Let's simple check: if we are in this state, is it a good entry?
-            # To avoid spamming, we might want to check if prev candle wasn't meeting all conditions?
-            # For scalping, simple "Crossover" check is better.
+            # STRICTER LONG REQUIREMENTS (data showed LONGs fail)
+            # Require RSI > 55 (not just > 50)
+            if last_row['rsi'] < 55:
+                return 'NONE', 0, 0, 0
             
-            # Refined Entry: fast EMA crossed above slow EMA recently OR close crossed above fast EMA
-            cross_up = (prev_row['ema_fast'] <= prev_row['ema_slow']) and (last_row['ema_fast'] > last_row['ema_slow'])
-            price_cross_up = (prev_row['close'] <= prev_row['ema_fast']) and (last_row['close'] > last_row['ema_fast'])
+            # Require stronger EMA separation (0.2% minimum gap)
+            ema_gap_pct = (last_row['ema_fast'] - last_row['ema_slow']) / last_row['ema_slow']
+            if ema_gap_pct < 0.002:
+                return 'NONE', 0, 0, 0
             
-            if cross_up or price_cross_up:
-                signal = 'LONG'
+            # PULLBACK ENTRY LOGIC (don't chase breakouts)
+            recent_high = df['high'].tail(10).max()
+            pullback_pct = (recent_high - last_row['close']) / recent_high
+            
+            # Must have pulled back at least 0.3% from recent high
+            if pullback_pct >= 0.003:
+                # Check if bouncing from EMA_fast support
+                price_near_ema = abs(last_row['close'] - last_row['ema_fast']) / last_row['close']
+                
+                if price_near_ema < 0.004:  # Within 0.4% of EMA
+                    # Require volume surge on bounce
+                    if last_row['volume'] > last_row['vol_ma'] * 1.3:
+                        signal = 'LONG'
 
-        # SHORT Condition
+        # SHORT Condition (performs better - 36.44% WR vs 19.61% LONG)
+        # Keep existing logic but slightly stricter
         elif (
-            last_row['close'] < last_row['ema_trend'] and # Trend Down
-            last_row['close'] < last_row['vwap'] and      # Below VWAP
-            last_row['ema_fast'] < last_row['ema_slow'] and # Fast EMA < Slow EMA
-            last_row['rsi'] < 50 and                   # Bearish Momentum
-            last_row['volume'] > last_row['vol_ma']    # Volume confirmation
+            last_row['close'] < last_row['ema_trend'] and
+            last_row['close'] < last_row['vwap'] and
+            last_row['ema_fast'] < last_row['ema_slow'] and
+            last_row['rsi'] < 50 and
+            last_row['volume'] > last_row['vol_ma']
         ):
+            # SHORT entries can be more lenient (they performed better)
             cross_down = (prev_row['ema_fast'] >= prev_row['ema_slow']) and (last_row['ema_fast'] < last_row['ema_slow'])
             price_cross_down = (prev_row['close'] >= prev_row['ema_fast']) and (last_row['close'] < last_row['ema_fast'])
             
@@ -72,21 +100,23 @@ class ScalpingStrategy:
                 signal = 'SHORT'
 
         if signal != 'NONE':
-            # Calculate Risk Parameters
+            # FIX 5: IMPROVED RISK MANAGEMENT
             atr = last_row['atr']
             entry_price = last_row['close']
             
-            # Stop Loss based on ATR (Volatility)
-            # Long: Entry - (ATR * Multiplier)
-            # Short: Entry + (ATR * Multiplier)
+            # Stop Loss based on ATR
             sl_dist = atr * self.risk_manager.sl_multiplier
+            
+            # FIX 6: INCREASE R:R TO 2.0x (was 1.5x)
+            # Data showed avg loss ($3.00) > avg win ($2.88)
+            tp_rr = 2.0  # Force 2:1 reward-to-risk
             
             if signal == 'LONG':
                 stop_loss = entry_price - sl_dist
-                take_profit = entry_price + (sl_dist * self.risk_manager.tp_rr)
+                take_profit = entry_price + (sl_dist * tp_rr)
             else:
                 stop_loss = entry_price + sl_dist
-                take_profit = entry_price - (sl_dist * self.risk_manager.tp_rr)
+                take_profit = entry_price - (sl_dist * tp_rr)
 
             return signal, entry_price, stop_loss, take_profit
 

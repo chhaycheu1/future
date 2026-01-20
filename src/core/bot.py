@@ -48,7 +48,7 @@ class TradingBot:
             
             # Run strategies
             for strategy_name, strategy in self.strategies:
-                signal, entry_price, stop_loss, take_profit = strategy.analyze(df)
+                signal, entry_price, stop_loss, take_profit = strategy.analyze(df, symbol=symbol)
                 if signal != 'NONE':
                     self.execute_trade(symbol, signal, entry_price, stop_loss, take_profit, strategy_name)
         except Exception as e:
