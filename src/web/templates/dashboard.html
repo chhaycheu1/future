@@ -126,39 +126,30 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td style="color: #60a5fa; font-weight: 500;">ScalpingStrategy</td>
-                        <td>{{ strategy_stats['ScalpingStrategy']['total_trades'] }}</td>
-                        <td>{{ strategy_stats['ScalpingStrategy']['win_rate'] }}%</td>
+                        <td style="color: #8b5cf6; font-weight: 500;">MomentumBreakout</td>
+                        <td>{{ strategy_stats['MomentumBreakout']['total_trades'] }}</td>
+                        <td>{{ strategy_stats['MomentumBreakout']['win_rate'] }}%</td>
                         <td
-                            class="{% if strategy_stats['ScalpingStrategy']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['ScalpingStrategy']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
-                            ${{ strategy_stats['ScalpingStrategy']['net_pnl'] }}
+                            class="{% if strategy_stats['MomentumBreakout']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['MomentumBreakout']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
+                            ${{ strategy_stats['MomentumBreakout']['net_pnl'] }}
                         </td>
                     </tr>
                     <tr>
-                        <td style="color: #34d399; font-weight: 500;">SmartScalpingStrategy</td>
-                        <td>{{ strategy_stats['SmartScalpingStrategy']['total_trades'] }}</td>
-                        <td>{{ strategy_stats['SmartScalpingStrategy']['win_rate'] }}%</td>
+                        <td style="color: #34d399; font-weight: 500;">MeanReversion</td>
+                        <td>{{ strategy_stats['MeanReversion']['total_trades'] }}</td>
+                        <td>{{ strategy_stats['MeanReversion']['win_rate'] }}%</td>
                         <td
-                            class="{% if strategy_stats['SmartScalpingStrategy']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['SmartScalpingStrategy']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
-                            ${{ strategy_stats['SmartScalpingStrategy']['net_pnl'] }}
+                            class="{% if strategy_stats['MeanReversion']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['MeanReversion']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
+                            ${{ strategy_stats['MeanReversion']['net_pnl'] }}
                         </td>
                     </tr>
                     <tr>
-                        <td style="color: #fbbf24; font-weight: 500;">TrendPullbackStrategy</td>
-                        <td>{{ strategy_stats['TrendPullbackStrategy']['total_trades'] }}</td>
-                        <td>{{ strategy_stats['TrendPullbackStrategy']['win_rate'] }}%</td>
+                        <td style="color: #fbbf24; font-weight: 500;">LiquidityGrab</td>
+                        <td>{{ strategy_stats['LiquidityGrab']['total_trades'] }}</td>
+                        <td>{{ strategy_stats['LiquidityGrab']['win_rate'] }}%</td>
                         <td
-                            class="{% if strategy_stats['TrendPullbackStrategy']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['TrendPullbackStrategy']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
-                            ${{ strategy_stats['TrendPullbackStrategy']['net_pnl'] }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="color: #f472b6; font-weight: 500;">RangeSweepStrategy</td>
-                        <td>{{ strategy_stats['RangeSweepStrategy']['total_trades'] }}</td>
-                        <td>{{ strategy_stats['RangeSweepStrategy']['win_rate'] }}%</td>
-                        <td
-                            class="{% if strategy_stats['RangeSweepStrategy']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['RangeSweepStrategy']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
-                            ${{ strategy_stats['RangeSweepStrategy']['net_pnl'] }}
+                            class="{% if strategy_stats['LiquidityGrab']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['LiquidityGrab']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
+                            ${{ strategy_stats['LiquidityGrab']['net_pnl'] }}
                         </td>
                     </tr>
                 </tbody>
