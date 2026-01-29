@@ -3,8 +3,6 @@ import threading
 from datetime import datetime
 from ..exchange.binance_client import BinanceClient
 from ..exchange.websocket_manager import BinanceWebSocket, WebSocketDataProvider
-from ..strategy.momentum_breakout_strategy import MomentumBreakoutStrategy
-from ..strategy.mean_reversion_strategy import MeanReversionStrategy
 from ..strategy.liquidity_grab_strategy import LiquidityGrabStrategy
 from ..core.risk_manager import RiskManager
 from ..database.db_manager import DBManager
@@ -16,10 +14,8 @@ class TradingBot:
         self.exchange = BinanceClient(config.BINANCE_API_KEY, config.BINANCE_API_SECRET, testnet=config.TESTNET)
         self.risk_manager = RiskManager(config, db_manager)
         
-        # Initialize NEW profitable strategies
+        # Active strategies
         self.strategies = [
-            # ("MomentumBreakout", MomentumBreakoutStrategy(self.risk_manager)),  # DISABLED - losing money
-            # ("MeanReversion", MeanReversionStrategy(self.risk_manager)),  # DISABLED - losing money
             ("LiquidityGrab", LiquidityGrabStrategy(self.risk_manager))
         ]
         

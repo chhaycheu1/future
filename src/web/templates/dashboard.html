@@ -126,24 +126,6 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td style="color: #8b5cf6; font-weight: 500;">MomentumBreakout</td>
-                        <td>{{ strategy_stats['MomentumBreakout']['total_trades'] }}</td>
-                        <td>{{ strategy_stats['MomentumBreakout']['win_rate'] }}%</td>
-                        <td
-                            class="{% if strategy_stats['MomentumBreakout']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['MomentumBreakout']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
-                            ${{ strategy_stats['MomentumBreakout']['net_pnl'] }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="color: #34d399; font-weight: 500;">MeanReversion</td>
-                        <td>{{ strategy_stats['MeanReversion']['total_trades'] }}</td>
-                        <td>{{ strategy_stats['MeanReversion']['win_rate'] }}%</td>
-                        <td
-                            class="{% if strategy_stats['MeanReversion']['net_pnl']|float > 0 %}pnl-positive{% elif strategy_stats['MeanReversion']['net_pnl']|float < 0 %}pnl-negative{% endif %}">
-                            ${{ strategy_stats['MeanReversion']['net_pnl'] }}
-                        </td>
-                    </tr>
-                    <tr>
                         <td style="color: #fbbf24; font-weight: 500;">LiquidityGrab</td>
                         <td>{{ strategy_stats['LiquidityGrab']['total_trades'] }}</td>
                         <td>{{ strategy_stats['LiquidityGrab']['win_rate'] }}%</td>
