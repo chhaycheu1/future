@@ -194,6 +194,47 @@ def toggle_bot():
         return jsonify({'status': 'success', 'is_running': new_status})
     return jsonify({'status': 'error', 'message': 'Bot state not found'}), 404
 
+@app.route('/api/close_position', methods=['POST'])
+def close_position():
+    """Manually close a position by placing a market order in the opposite direction."""
+    try:
+        data = request.get_json()
+        symbol = data.get('symbol')
+        side = data.get('side')  # Current position side (LONG or SHORT)
+        quantity = data.get('quantity')
+        
+        if not all([symbol, side, quantity]):
+            return jsonify({'status': 'error', 'message': 'Missing required fields: symbol, side, quantity'}), 400
+        
+        # Initialize exchange client
+        exchange = BinanceClient(
+            Config.BINANCE_API_KEY, 
+            Config.BINANCE_API_SECRET, 
+            testnet=getattr(Config, 'TESTNET', False)
+        )
+        
+        # Close position by placing opposite order
+        # If LONG, sell to close. If SHORT, buy to close.
+        close_side = 'SELL' if side == 'LONG' else 'BUY'
+        
+        result = exchange.client.futures_create_order(
+            symbol=symbol,
+            side=close_side,
+            type='MARKET',
+            quantity=float(quantity),
+            reduceOnly=True  # Ensure this only closes existing position
+        )
+        
+        return jsonify({
+            'status': 'success', 
+            'message': f'Position closed: {symbol} {side}',
+            'order': result
+        })
+        
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
 @app.route('/api/backtest', methods=['POST'])
 def run_backtest():
     """Run a backtest on historical data."""
