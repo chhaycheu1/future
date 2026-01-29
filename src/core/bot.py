@@ -18,8 +18,8 @@ class TradingBot:
         
         # Initialize NEW profitable strategies
         self.strategies = [
-            ("MomentumBreakout", MomentumBreakoutStrategy(self.risk_manager)),
-            ("MeanReversion", MeanReversionStrategy(self.risk_manager)),
+            # ("MomentumBreakout", MomentumBreakoutStrategy(self.risk_manager)),  # DISABLED - losing money
+            # ("MeanReversion", MeanReversionStrategy(self.risk_manager)),  # DISABLED - losing money
             ("LiquidityGrab", LiquidityGrabStrategy(self.risk_manager))
         ]
         
